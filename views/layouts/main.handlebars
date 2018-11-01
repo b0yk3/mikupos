@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Miku Coffee Shop</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="/assets/styles.css">
+
+		<script type="text/javascript" src="/webix/codebase/webix.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="webix/codebase/skins/mini.min.css">
+	</head>
+	<body>
+		<h1 class='header'>
+			<a href="/">
+		
+			Miku Coffe Shop
+			</a>
+		</h1>
+		<div class='mainarea'>
+			<ul class='left'>
+{{#each menu}}
+<li><span>{{value}}</span><ul>
+	{{#each data}}
+	<li class='{{css}}'><a href='{{href}}'>{{value}}</a></li>
+	{{/each}}
+</ul></li>
+{{/each}}
+			</ul>
+			<content class="right">{{{body}}}</content>
+		</div>
+	</body>
+</html>

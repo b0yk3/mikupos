@@ -1,0 +1,2 @@
+2018/11/01 11:16:30 [emerg] 19632#9208: CreateFile() "C:\Users\bys\Saved Games\webix\pos/conf/nginx.conf" failed (3: The system cannot find the path specified)
+2018/11/01 11:16:50 [emerg] 22404#16236: "server" directive is not allowed here in C:\Users\bys\Saved Games\webix\pos/conf/nginx.conf:1
