@@ -45,7 +45,7 @@ var User = sequelize.define('user', {
 
   
 module.exports = {
- User, Item, Htrans, Dtrans  
+ User, Item, Htrans, Dtrans, Itemgrp  
 };
 
 /*

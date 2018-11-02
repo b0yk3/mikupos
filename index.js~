@@ -31,8 +31,4 @@ app.post('/data/item', frmitem.itemSave );
 app.put('/data/item/:itemId', frmitem.itemUpdate );
 app.delete('/data/item/:itemId', frmitem.itemDelete);
 
-app.get('/data/itemopt' , frmitem.itemgrpOptions);
-
-console.log("app start on port : 9829 ");
-
 app.listen(9829);

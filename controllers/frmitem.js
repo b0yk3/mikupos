@@ -13,7 +13,7 @@ var itemData = function(req, res){
 
 var itemUpdate = function(req,res){
     console.log( req.body)
-    var { itemcode, itemdesc, itemprices, itemhpp, itemunit } = req.body;
+    var { itemcode, itemdesc, itemprices, itemhpp, itemunit, posigrpId } = req.body;
     db.Item.findById(req.params.itemId)
      .then((item) => item.update(req.body))
      .then(() => res.json({}));
@@ -25,4 +25,8 @@ var itemDelete = function ( req, res ){
       .then( () => res.json({}));
 }
 
-module.exports = { itemSave, itemData, itemUpdate, itemDelete}
+var itemgrpOptions = function(req, res){
+    db.Itemgrp.findAll({ attributes: ["id", ["grpdesc", "value"]] }).then((data) => res.json(data));
+}
+
+module.exports = { itemSave, itemData, itemUpdate, itemDelete , itemgrpOptions }
