@@ -1,0 +1,176 @@
+<div id='grid-container'></div>
+<script>
+const urlhdata = "http://localhost:9829/data/htrans";
+const urlddata = "http://localhost:9829/data/dtrans/1";
+
+const formatangka = "1,111.00";
+const tinggi = 0;
+
+const col1 = [
+  { id: "pitemdesc" , width: 200,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
+  { id: "pitemprices" ,  css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
+  { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Jumlah", sort: "int" },
+  { id: "desc" , header: "*Keterangan", editor: "text", fillspace: true }
+               ];
+
+const frm1 =  { view:"datatable" ,
+      width: 400, 
+      id : "frm1" ,            
+               editable: true,
+      url: urlddata,
+      columns: col1
+    }
+
+
+const kliksave = function(){
+  
+  (function(f){
+    f.save().then( () =>
+    webix.message('data saved'));
+  })($$("frm1"));
+
+}
+
+const klikdel = function(){
+  
+  (function(l){
+    var id = l.getSelectedId();
+    l.remove(id);
+    webix.message(id + " was removed from the list");    
+  })($$("lst1"));
+
+}
+
+const klikfind = function(){
+  var nid;
+  (function(l,t){
+   var f = t.getValue();
+   
+
+    l.filter("#itemdesc#",f );
+    l.select();
+
+    nid = l.getSelectedId();
+
+    l.filter();
+
+    l.select(nid);
+
+  
+
+  })($$("lst1"),$$("cari"))
+  
+  
+
+}
+    
+const klikrefresh = function(){
+  (function(f,l){
+    f.clear();
+    l.clearAll();
+    l.load(localurl);
+      webix.message('data reload..');
+  })($$("frm1"),$$("lst1"));
+
+
+}
+
+const klikadd = function(){
+  
+  (function(f,l){
+    f.clear();
+    l.unselectAll();
+      webix.message('New record..');
+  })($$("frm1"),$$("lst1"))
+  
+
+}
+
+const tb = {
+    view:"toolbar",
+    id:"myToolbar",
+    cols:[      
+      {view: "button" ,width:35 ,click: klikrefresh ,type: "iconButton", icon: "wxi-sync"},
+      {view: "button" ,width:35 ,click: kliksave, type: "iconButton", icon: "wxi-check"},
+      {view: "button",width:35 ,click: klikdel, type: "iconButton", icon: "wxi-minus"},
+      {template: "Data pesanan" , type:"section" , gravity: 0.2 }]
+}
+
+
+const atitle = {view: "toolbar", 
+                  id: "h1" ,
+                  cols:[{view:"text", 
+                         id: "cari", 
+                         placeholder: "search items.." , 
+                         suggest: { 
+                           body: { 
+                             dataFeed: function(text){
+                                this.clearAll();
+                                this.load("/data/itemfinder/" + text);                               
+                               }
+                             }
+                         }},
+                     {view:"button",click: klikfind, width:35 ,type: "iconButton", icon: "wxi-plus"}]                  
+                 }
+
+const afooter = {template: " " , type: "footer"}
+
+/*
+const aview = { view: "tabview",
+                height: tinggi,
+                cells: [{header: "Input Mode",id: "form", rows:[tb,frm1,{template: "* tidak perlu diisi (readonly)"}]},lst1]
+              }
+*/
+
+
+var isi = { width: 600, type:"space" , rows:[tb,atitle,frm1,afooter]}    
+
+
+webix.ui({
+      container: "grid-container",
+      height: 800,
+  rows:[{view: "kanban" , type: "space" ,
+
+         cols: [{ header: "Pesanan",
+                  body: { view: "kanbanlist", status:"new" }},
+                { header: "Antaran",
+                  body: {view: "kanbanlist", status:"srv"}},
+                { header: "Bayar",
+                  body: {view: "kanbanlist", status:"end"}}            
+               ],
+         url: urlhdata,
+         id: "kanban1"
+          },
+        { view: "datatable", url: urlhdata, autoConfig: true, id: "grid1" }
+  ]
+  });
+
+webix.ui({
+  view: "window",
+  id: "win1",
+  width: 600,
+  height: 480,
+  move: true,
+  modal: true,
+  left:200,
+  top:20,
+  body: isi,
+  head:{
+    view:"toolbar", cols:[
+      {view:"label", label: "Detail Pemesanan" },
+      {view:"button", type: "iconButton" , width: 30, icon: "wxi-close", align: 'right', click:"$$('win1').hide();"}
+    ]
+  }
+});
+
+webix.ready(function(){
+$$("kanban1").attachEvent("onListAfterDrop", function(context,ev,list){
+    $$("grid1").refresh();
+ });
+  
+$$("kanban1").attachEvent("onListIconClick", function(iconId, itemId,ev,node,list){
+     $$("win1").show();
+    return false;
+});  
+});
+</script>

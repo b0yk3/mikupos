@@ -24,7 +24,10 @@ Item.belongsTo(Itemgrp)
 
 var Htrans = sequelize.define('poshtrans',{
     date: Sequelize.DATE,
-    desc: Sequelize.STRING
+    desc: Sequelize.STRING,
+    status: Sequelize.STRING(5),
+    text: Sequelize.TEXT,
+    tags: Sequelize.STRING(3)
 });
 
 var Dtrans = sequelize.define('posdtrans',{
@@ -34,6 +37,7 @@ var Dtrans = sequelize.define('posdtrans',{
 
 Dtrans.belongsTo(Item);
 Dtrans.belongsTo(Htrans);
+Htrans.hasMany(Dtrans);
 
 var User = sequelize.define('user', {
   username: Sequelize.STRING,
@@ -51,8 +55,6 @@ module.exports = {
 };
 
 /*
-
-
 sequelize.sync({ force: true}).then( () => { 
 
 Itemgrp.create({
@@ -108,10 +110,25 @@ Item.create({
   posigrpId: 2
 });
 
+Htrans.create({
+  date: "2018-10-11",
+  desc: "test",
+  text: "data penjualan",
+  status: "new",
+  tags: "POS"
+});
+
+Dtrans.create({
+  poshtranId: "1",
+  positemId: "1",
+  qty: 10,
+  desc: "test data"
+});
+
+
 
 
 console.log('success')
 
 });
-
 */

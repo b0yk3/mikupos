@@ -24,6 +24,7 @@ app.use(function(req, res, next) {
 var menu = require("./menu");
 app.get('/', 	 (req, res) => res.render('home', menu(req) ));  
 app.get('/item', (req,res) => res.render('item', menu(req) ));
+app.get('/trans', (req,res) => res.render('trans', menu(req) ));
 
 var frmitem = require("./controllers/frmitem")
 app.get('/data/item',  frmitem.itemData );
@@ -33,6 +34,10 @@ app.delete('/data/item/:itemId', frmitem.itemDelete);
 
 app.get('/data/itemopt' , frmitem.itemgrpOptions);
 app.get('/data/itemfinder/:itemdesc' , frmitem.itemSearch);
+
+var frmtrans = require("./controllers/frmtrans");
+app.get('/data/htrans', frmtrans.frmhtrans );
+app.get('/data/dtrans/:transid', frmtrans.frmdtrans );
 
 console.log("app start on port : 9829 ");
 
