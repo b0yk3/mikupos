@@ -29,4 +29,10 @@ var itemgrpOptions = function(req, res){
     db.Itemgrp.findAll({ attributes: ["id", ["grpdesc", "value"]] }).then((data) => res.json(data));
 }
 
-module.exports = { itemSave, itemData, itemUpdate, itemDelete , itemgrpOptions }
+var itemSearch = function(req, res){
+    var f = "%" + req.params.itemdesc + "%";
+    db.Item.findAll({ attributes: ["id", ["itemdesc", "value"]],
+                     where: { itemdesc: {[db.op.like] : f }} }).then((data) => res.json(data));
+}
+
+module.exports = { itemSave, itemData, itemUpdate, itemDelete , itemgrpOptions, itemSearch }

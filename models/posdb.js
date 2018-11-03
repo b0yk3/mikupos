@@ -5,6 +5,8 @@ var sequelize = new Sequelize('dbpos001', 'root', '',{
   dialect:"mysql"
 });
 
+const op = Sequelize.Op;
+
 var Item = sequelize.define( 'positem',
 {
   itemcode: Sequelize.STRING(10),
@@ -45,7 +47,7 @@ var User = sequelize.define('user', {
 
   
 module.exports = {
- User, Item, Htrans, Dtrans, Itemgrp  
+ User, Item, Htrans, Dtrans, Itemgrp, op 
 };
 
 /*

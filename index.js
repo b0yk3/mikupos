@@ -32,6 +32,7 @@ app.put('/data/item/:itemId', frmitem.itemUpdate );
 app.delete('/data/item/:itemId', frmitem.itemDelete);
 
 app.get('/data/itemopt' , frmitem.itemgrpOptions);
+app.get('/data/itemfinder/:itemdesc' , frmitem.itemSearch);
 
 console.log("app start on port : 9829 ");
 

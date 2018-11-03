@@ -1,5 +1,6 @@
 <div id='grid-container'></div>
 <script>
+const formatangka = "1,111.00";
 const tinggi = 0;
 const localurl = "/data/item";
 const frmitemEl =  [{ 
@@ -9,11 +10,15 @@ const frmitemEl =  [{
        labelWidth: 100},
        {view: "text",
        name: "itemprices",
+       format: formatangka,
        label: "Harga : ",
+       inputAlign: "right",
        labelWidth: 100},
        {view: "text",
        name: "itemhpp",
+       format: formatangka,
        label: "harga dasar : ",
+       inputAlign: "right",
        labelWidth: 100},
        {view: "text",
        name: "itemunit",
@@ -28,9 +33,16 @@ const frmitemEl =  [{
        options:"/data/itemopt" }
                   ];
 
+const frm1 =  { view:"form" ,
+      width: 360, 
+      id : "frm1" ,
+      elements : frmitemEl
+    }
+
+
 const lst1 = { view: "list" , header: "browse" , id: "lst1" ,
-      type : { height : 85 },
-      template : "#itemdesc#&nbsp;&nbsp;#itemprices#<p>Group : #posigrpId#</p>",
+      type : { height : 30 },
+      template : "#itemdesc#&nbsp;&nbsp;#itemprices# Group : #posigrpId#",
       url: localurl,
       save: "rest->" + localurl, 
       select: true
@@ -52,6 +64,29 @@ const klikdel = function(){
     l.remove(id);
     webix.message(id + " was removed from the list");    
   })($$("lst1"));
+
+}
+
+const klikfind = function(){
+  var nid;
+  (function(l,t){
+   var f = t.getValue();
+   
+
+    l.filter("#itemdesc#",f );
+    l.select();
+
+    nid = l.getSelectedId();
+
+    l.filter();
+
+    l.select(nid);
+
+  
+
+  })($$("lst1"),$$("cari"))
+  
+  
 
 }
     
@@ -81,7 +116,7 @@ const tb = {
     view:"toolbar",
     id:"myToolbar",
     cols:[      
-      {view: "button" ,width:35 ,type: "iconButton", icon: "wxi-search"},
+      {view: "button" ,width:35 ,click: klikrefresh ,type: "iconButton", icon: "wxi-sync"},
       {view: "button" ,width:35 ,click: kliksave, type: "iconButton", icon: "wxi-check"},
       {view: "button",width:35 ,click: klikadd, type: "iconButton", icon: "wxi-plus"},
       {view: "button",width:35 ,click: klikdel, type: "iconButton", icon: "wxi-minus"},
@@ -89,24 +124,37 @@ const tb = {
 }
 
 
-const frm1 =  { view:"form" , 
-      id : "frm1" ,
-      elements : frmitemEl
-    }
-
 const atitle = {view: "toolbar", 
                   id: "h1" ,
-                  cols:[{template:"Miku Coffee" },{view:"button",click: klikrefresh, width:35 ,type: "iconButton", icon: "wxi-sync"}]                  
+                  cols:[{view:"text", 
+                         id: "cari", 
+                         placeholder: "search items.." , 
+                         suggest: { 
+                           body: { 
+                             dataFeed: function(text){
+                                this.clearAll();
+                                this.load("/data/itemfinder/" + text);                               
+                               }
+                             }
+                         }},
+                     {view:"button",click: klikfind, width:35 ,type: "iconButton", icon: "wxi-search"}]                  
                  }
 
 const afooter = {template: "(C) 2018 Miku Coffee" , type: "header"}
 
+/*
 const aview = { view: "tabview",
                 height: tinggi,
                 cells: [{header: "Input Mode",id: "form", rows:[tb,frm1,{template: "* tidak perlu diisi (readonly)"}]},lst1]
               }
+*/
 
-var isi = { width: 800,  type:"space", container: "grid-container" , rows:[atitle,aview,afooter]}    
+const aview = { type: "wide",
+                height: tinggi,                
+                cols: [frm1,lst1]
+                }
+
+var isi = { width: 800,  type:"space", container: "grid-container" , rows:[tb,atitle,aview,afooter]}    
 
 webix.ui(isi);
 
