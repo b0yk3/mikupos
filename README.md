@@ -1,3 +1,6 @@
 # EasyPOS V.0.1
 
-(C) 2018 b0yk3
+Simple point of sales for small/medium cafe shop
+
+(C) 2018 Author b0yk3
+
