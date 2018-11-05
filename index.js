@@ -39,6 +39,16 @@ var frmtrans = require("./controllers/frmtrans");
 app.get('/data/htrans', frmtrans.frmhtrans );
 app.get('/data/dtrans/:transid', frmtrans.frmdtrans );
 
+app.get('/data/htrans/getlast/id', frmtrans.getlasthid );
+app.post('/data/htrans', frmtrans.htranssave );
+app.put('/data/htrans/:transid', frmtrans.htransupdate );
+
+
+app.post('/data/dtrans', frmtrans.dtranssave );
+app.put('/data/dtrans/:dtransid', frmtrans.dtransupdate );
+app.delete('/data/dtrans/:dtransId', frmtrans.dtransdelete);
+
+
 console.log("app start on port : 9829 ");
 
 app.listen(9829);

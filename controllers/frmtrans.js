@@ -17,4 +17,41 @@ var frmdtrans = function(req, res){
     .then( d => res.json(d))
 }
 
-module.exports = { frmdtrans, frmhtrans }
+var htranssave = function( req, res){
+   console.log(req.body);
+     db.Htrans.create(req.body).then( (o) => 
+     res.json({ id: o.id}));
+}
+
+var getlasthid = function( req , res ){
+    db.Htrans.max('id').then( d => res.json(d));
+}    
+
+var htransupdate = function( req, res ){
+    var id = req.params.transid;
+    db.Htrans.findById(id)
+    .then((htrans) => htrans.update(req.body))
+    .then(() => res.json({}));
+    
+}
+
+var dtransupdate = function( req , res ){
+    db.Dtrans.findById(req.params.dtransid)
+    .then((dtrans) => dtrans.update(req.body))
+    .then(() => res.json({}));
+}
+
+var dtranssave = function( req, res){
+    console.log(req.body);
+      db.Dtrans.create(req.body).then( (o) => 
+      res.json({ id: o.id}));
+ }
+
+ var dtransdelete = function ( req, res ){
+    db.Dtrans.findById(req.params.dtransId)
+      .then( (dtrans) => dtrans.destroy())
+      .then( () => res.json({}));
+}
+
+module.exports = { frmdtrans, frmhtrans, htranssave, getlasthid, dtransdelete,
+                   htransupdate,dtransupdate, dtranssave }

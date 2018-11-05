@@ -54,7 +54,7 @@ module.exports = {
  User, Item, Htrans, Dtrans, Itemgrp, op 
 };
 
-/*
+
 sequelize.sync({ force: true}).then( () => { 
 
 Itemgrp.create({
@@ -131,4 +131,4 @@ Dtrans.create({
 console.log('success')
 
 });
-*/
+

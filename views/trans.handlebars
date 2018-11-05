@@ -1,24 +1,39 @@
 <div id='grid-container'></div>
 <script>
 const urlhdata = "http://localhost:9829/data/htrans";
-const urlddata = "http://localhost:9829/data/dtrans/1";
+const urlddata = "http://localhost:9829/data/dtrans";
 
 const formatangka = "1,111.00";
 const tinggi = 0;
 
-const col1 = [
-  { id: "pitemdesc" , width: 200,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
-  { id: "pitemprices" ,  css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
-  { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Jumlah", sort: "int" },
-  { id: "desc" , header: "*Keterangan", editor: "text", fillspace: true }
-               ];
+var globalItemID;
 
-const frm1 =  { view:"datatable" ,
-      width: 400, 
-      id : "frm1" ,            
-               editable: true,
-      url: urlddata,
-      columns: col1
+/*
+webix.i18n.parseFormat = "%c";
+
+webix.i18n.dateFormat = "%Y-%m-%d";
+webix.i18n.setLocale();
+
+
+webix.i18n.parseFormat  = "%Y-%m-%d";
+webix.i18n.setLocale("en-US");
+*/
+
+
+var table1 =  { view:"datatable" ,
+     // width: 400, 
+      id : "table1" ,            
+      editable: true,
+      save: "rest->" + urlddata,
+      math: true,
+      select : true,
+      columns: [
+  { id: "pitemdesc" , width: 130,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
+  { id: "pitemprices" , format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
+  { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Qty", sort: "int" },
+  { id: "total" ,  css:{'text-align':'right'}, format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:1] * [$r,:2]" },
+  { id: "desc" , header: "*Keterangan", editor: "text", fillspace: true }
+               ]
     }
 
 
@@ -27,7 +42,7 @@ const kliksave = function(){
   (function(f){
     f.save().then( () =>
     webix.message('data saved'));
-  })($$("frm1"));
+  })($$("table1"));
 
 }
 
@@ -37,30 +52,7 @@ const klikdel = function(){
     var id = l.getSelectedId();
     l.remove(id);
     webix.message(id + " was removed from the list");    
-  })($$("lst1"));
-
-}
-
-const klikfind = function(){
-  var nid;
-  (function(l,t){
-   var f = t.getValue();
-   
-
-    l.filter("#itemdesc#",f );
-    l.select();
-
-    nid = l.getSelectedId();
-
-    l.filter();
-
-    l.select(nid);
-
-  
-
-  })($$("lst1"),$$("cari"))
-  
-  
+  })($$("table1"));
 
 }
     
@@ -70,18 +62,28 @@ const klikrefresh = function(){
     l.clearAll();
     l.load(localurl);
       webix.message('data reload..');
-  })($$("frm1"),$$("lst1"));
+  })($$("table1"),$$("lst1"));
 
 
 }
 
 const klikadd = function(){
   
-  (function(f,l){
-    f.clear();
-    l.unselectAll();
-      webix.message('New record..');
-  })($$("frm1"),$$("lst1"))
+  (function(f,t){
+      var pilih = t.data.value;
+      webix.ajax("/data/itemfinder/"+pilih,function(text,data){
+           var hasil_id = data.json()[0].id;
+           webix.ajax().post(urlddata ,
+             { poshtranId : globalItemID, 
+               positemId : hasil_id ,
+               qty : 1
+             }
+           );
+           f.clearAll();
+           f.load(urlddata + "/" + globalItemID);
+           t.setValue("");
+      });
+  })($$("table1"),$$("cari"))
   
 
 }
@@ -93,7 +95,7 @@ const tb = {
       {view: "button" ,width:35 ,click: klikrefresh ,type: "iconButton", icon: "wxi-sync"},
       {view: "button" ,width:35 ,click: kliksave, type: "iconButton", icon: "wxi-check"},
       {view: "button",width:35 ,click: klikdel, type: "iconButton", icon: "wxi-minus"},
-      {template: "Data pesanan" , type:"section" , gravity: 0.2 }]
+      {template: "Pemeliharaan data penjualan.." , type:"section" , gravity: 0.2 }]
 }
 
 
@@ -110,40 +112,94 @@ const atitle = {view: "toolbar",
                                }
                              }
                          }},
-                     {view:"button",click: klikfind, width:35 ,type: "iconButton", icon: "wxi-plus"}]                  
+                     {view:"button",click: klikadd, width:35 ,type: "iconButton", icon: "wxi-plus"}]                  
                  }
 
 const afooter = {template: " " , type: "footer"}
 
-/*
-const aview = { view: "tabview",
-                height: tinggi,
-                cells: [{header: "Input Mode",id: "form", rows:[tb,frm1,{template: "* tidak perlu diisi (readonly)"}]},lst1]
-              }
-*/
 
 
-var isi = { width: 600, type:"space" , rows:[tb,atitle,frm1,afooter]}    
+const isi = { width: 600, type:"space" , rows:[atitle,table1,tb]}   
+
+
+
+const frm1save = function(){
+  
+  (function(f,w,k){
+    webix.ajax().post(urlhdata,f.getValues());
+    webix.message('save');
+    w.hide();
+    k.clearAll();
+    k.load(urlhdata);
+})($$("frmnewtrans"),$$("winnewtrans"),$$("kanban1"))
+}
+
+const frmnewtrans =  { view:"form" ,
+      id : "frmnewtrans" ,                                
+      elements : [
+       {view: "datepicker" , stringResult: true, timepicker: true , labelWidth: 100, id: "date", name: "date", label: "Tanggal : "},
+       {view: "text" , id: "text", labelWidth: 100, name: "text", label : "Nama Pembeli : "} ,
+       {view: "combo" , id: "tags" , labelWidth: 100 , name: "tags" , value : "B" , 
+                        options : [ { id: "B", value: "Minuman"},
+                                    { id: "F" , value: "Makanan" },
+                                    { id: "F&B" , value: "Makanan dan Minuman" }  
+                        ]},
+       {view:"toolbar", cols: [{view:"button", value: "Tambah", click: frm1save },
+                               {view:"button", value: "Cancel" , click:"$$('winnewtrans').hide();" }]}      
+      ]
+    }
+
+
+const kliknewtrans = function()
+{
+  (function(w,f){
+    f.clear();
+    f.setValues({ status : "new", tags : "" });
+    w.show();
+
+  })($$("winnewtrans"),$$("frmnewtrans"));
+}
+
 
 
 webix.ui({
       container: "grid-container",
-      height: 800,
-  rows:[{view: "kanban" , type: "space" ,
-
-         cols: [{ header: "Pesanan",
-                  body: { view: "kanbanlist", status:"new" }},
-                { header: "Antaran",
-                  body: {view: "kanbanlist", status:"srv"}},
-                { header: "Bayar",
-                  body: {view: "kanbanlist", status:"end"}}            
-               ],
+      height: 600,
+      rows:[{ view: "toolbar" , id: "tb1", height: 40, 
+            cols: [{view: "button" , click: kliknewtrans, width: 35, type: "iconButton" , icon: "wxi-plus"},
+            {type: "section" , template: "Transaksi Penjualan - silahkan klik tombol [ + ] untuk data baru "}]},
+            {view: "kanban" , type: "space" ,
+             cols: [{ header: "Pesanan",
+                      body: { view: "kanbanlist", status:"new"}},
+                    { header: "Antaran",
+                      body: {view: "kanbanlist", status:"srv"}},
+                    { header: "Bayar",
+                      body: {view: "kanbanlist", status:"end"}},
+                    { header: "Cancel",
+                      body: {view: "kanbanlist", status:"cnl"}}            
+                  ],
          url: urlhdata,
          id: "kanban1"
-          },
-        { view: "datatable", url: urlhdata, autoConfig: true, id: "grid1" }
+          }    
   ]
   });
+
+
+webix.ui({
+  view: "window",
+  id: "winnewtrans",
+  top: 35,
+  left: 280,
+  height: 350,
+  widht: 300,
+  body:  frmnewtrans,
+  head:{
+    view:"toolbar", cols:[
+      {view:"label", label: "Tambah baru data penjualan" },
+      {view:"button", type: "iconButton" , width: 30, icon: "wxi-close", align: 'right', click:"$$('winnewtrans').hide();"}
+    ]
+  }
+});
 
 webix.ui({
   view: "window",
@@ -157,20 +213,30 @@ webix.ui({
   body: isi,
   head:{
     view:"toolbar", cols:[
-      {view:"label", label: "Detail Pemesanan" },
+      {view:"label", label: "Data Penjualan" },
       {view:"button", type: "iconButton" , width: 30, icon: "wxi-close", align: 'right', click:"$$('win1').hide();"}
     ]
   }
 });
 
 webix.ready(function(){
-$$("kanban1").attachEvent("onListAfterDrop", function(context,ev,list){
-    $$("grid1").refresh();
- });
-  
+
+ 
 $$("kanban1").attachEvent("onListIconClick", function(iconId, itemId,ev,node,list){
+     var durl = urlddata + "/" + itemId;
+     $$("table1").clearAll();
+     $$("table1").load(durl);
+     globalItemID = itemId;
+   console.log(    $$("table1").data );
      $$("win1").show();
     return false;
-});  
+}); 
+
+
+$$("kanban1").attachEvent("onAfterStatusChange", function(itemId,status,list){
+    webix.ajax().put(urlhdata + "/" + itemId , { status: status });
+});
+
+
 });
 </script>
