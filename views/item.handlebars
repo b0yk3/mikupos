@@ -6,10 +6,12 @@ const localurl = "/data/item";
 const frmitemEl =  [{ 
        view: "text",
        name: "itemdesc",
+       required: true,
        label: "Nama Produk : ",
        labelWidth: 100},
        {view: "text",
        name: "itemprices",
+       required: true,
        format: formatangka,
        label: "Harga : ",
        inputAlign: "right",
@@ -19,10 +21,12 @@ const frmitemEl =  [{
        format: formatangka,
        label: "harga dasar : ",
        inputAlign: "right",
+       values: 0,
        labelWidth: 100},
        {view: "text",
        name: "itemunit",
-       label: "Satuan : " , 
+       label: "Satuan : " ,
+       values: "CUP", 
        width: 170,
        labelWidth: 100},
        {view:"richselect", 
@@ -30,7 +34,7 @@ const frmitemEl =  [{
        width: 250, 
        label:"Group : ",
        labelWidth: 100, 
-       options:"/data/itemopt" }
+       options:"myProxy->/data/itemopt" }
                   ];
 
 const frm1 =  { view:"form" ,
@@ -42,18 +46,19 @@ const frm1 =  { view:"form" ,
 
 const lst1 = { view: "list" , header: "browse" , id: "lst1" ,
       type : { height : 30 },
-      template : "#itemdesc#&nbsp;&nbsp;#itemprices# Group : #posigrpId#",
-      url: localurl,
-      save: "rest->" + localurl, 
+      template : "#itemdesc#&nbsp;&nbsp;#itemprices#&nbsp;#id# Group : #posigrpId#",
+      url: "myProxy->"+localurl,
+      save: "myProxy->"+localurl, 
       select: true
     }
 
 const kliksave = function(){
   
-  (function(f){
-    f.save().then( () =>
-    webix.message('data saved'));
-  })($$("frm1"));
+  (function(f,l){
+    f.validate();
+    f.save();
+    webix.message("saved..");
+  })($$("frm1"),$$("lst1"));
 
 }
 
@@ -94,7 +99,7 @@ const klikrefresh = function(){
   (function(f,l){
     f.clear();
     l.clearAll();
-    l.load(localurl);
+    l.load("myProxy->"+localurl);
       webix.message('data reload..');
   })($$("frm1"),$$("lst1"));
 
@@ -133,7 +138,7 @@ const atitle = {view: "toolbar",
                            body: { 
                              dataFeed: function(text){
                                 this.clearAll();
-                                this.load("/data/itemfinder/" + text);                               
+                                this.load("myProxy->/data/itemfinder/" + text);                               
                                }
                              }
                          }},

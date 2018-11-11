@@ -12,6 +12,10 @@ module.exports = function(req){
     { value:"Laporan", data:[
       { href:'/lap1', value:"Rekap laporan penjualan harian" },
       { href:'/lap2', value:"Analisa laporan" }
+    ]},
+    { value:"Bantuan", data:[
+      { href:'/about', value:"Tentang Program" },
+      { href:'/logout', value:"Logout" }
     ]}
   ];
 

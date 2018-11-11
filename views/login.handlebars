@@ -1,0 +1,94 @@
+<div id='grid-container'></div>
+
+<script>
+let values = { username: "" , password: ""}
+
+let logui = {
+            cols: [
+                { gravity:1, template:"" },
+                {
+                    rows: [
+                        {gravity: 1, template: ""},
+                        {
+                            view:  "form",
+                            gravity: 1,
+                            id:    'loginForm',
+                            width: 500,
+
+                            elements:       [
+                                {
+                                    view:        "text",
+                                    id:          "username",
+                                    name:        "username",
+                                    label:       "Username",
+                                    value:       values.username,
+                                    required:    true,
+                                    placeholder: 'username'
+                                },
+                                {
+                                    view:     "text",
+                                    id:       "password",
+                                    name: "password",
+                                    label:    "Password",
+                                    value: values.password,
+                                    required: true,
+                                    type:     "password"
+                                },
+                               
+                                {
+                                    view:     "button",
+                                    id: "login",
+                                    name: "login",
+                                    label: "Login",
+                                    hotkey: "enter",
+                                    click: function() {
+                                        let component = $$("loginForm");
+                                        if (component.validate()) {
+                                            component.disable();
+                                     
+                                            values = $$("loginForm").getValues();
+
+                                            webix.ajax().get('/login/' + values.username + '/' +
+                                                                       values.password, function(resp)
+                                                                       {
+                                                                         console.log(resp);
+                                                                         webix.storage.cookie.put('login',resp);                                                                             
+                                                                         component.enable();
+                                                                         $$("logwin").close();
+                                                                       });							
+                                        
+                                          
+                                        } else {
+                                            $$("loginForm").focus();
+                                        }
+                                    }
+                                }
+                            ],
+                            elementsConfig: {
+                                labelPosition: "top",
+                                validateEvent: "key"
+                            }
+                        },
+                        {gravity: 1, template: ""}
+                    ]
+                },
+                { gravity:1, template:"" }
+            ]
+        };
+
+	let frmlogin =
+	    { view: "window",
+      body: logui,
+      id: "logwin",
+      modal: true,
+      head: "Miku Point Of Sales",
+      move: true,
+			position: "center"
+     }
+
+
+webix.ui(frmlogin).show();    
+
+webix.ready(()=> webix.storage.cookie.clear());
+
+</script>

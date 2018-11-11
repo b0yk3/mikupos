@@ -1,11 +1,21 @@
-var express = require('express');
-var exphbs  = require('express-handlebars');
-var bodyParser = require('body-parser');
+const express = require('express');
+const exphbs  = require('express-handlebars');
+const bodyParser = require('body-parser');
+const cookieSession = require('cookie-session');
 
-var app = express();
-var bars = exphbs({ 
+const jwt = require('express-jwt');
+const jsonwebtoken = require('jsonwebtoken');
+
+const app = express();
+const bars = exphbs({ 
 	defaultLayout: 'main'
 })
+
+const auth = jwt({ secret: 'harussudahd13ncrypted', requestProperty: 'auth'})
+.unless({ path: ["/favicon.ico","/","/logout", "/item","/trans","/auth" , /^\/login\/.*/]  });
+
+// Generate valid JWT
+// console.log(jsonwebtoken.sign({ foo: 'bar' }, 'thisIsSecret'));
 
 app.engine('handlebars', bars)
 app.set('view engine', 'handlebars')
@@ -17,17 +27,97 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
-    next();
-  });
+    
+     next();
+    });
 
+app.use(function(err, req, res, next) {
+      if (err.constructor.name === 'UnauthorizedError') {
+          res.status(401).send('invalid token...');
+      }
+});
+
+app.use(auth);
+app.set('trust proxy',1);
+
+app.use(cookieSession(
+  {
+    name: "session" ,
+    keys: ['ini_bukan_kunci']
+  
+  }
+))
+
+    /*
+app.use(jwt(
+{
+  secret : '1e8caa4bd327832d6d1e236e097d8f1b' ,
+  credentialsRequired: false
+  //audience : ''
+}
+));
+
+//.unless({ path: ["/tokenauth" ,"/"]}));
+
+  /*
+var iauth = function(req, res, next){
+  console.log("iaut calling");
+  console.log( req.headers)
+ if( req.headers.xtoken ){
+  console.log("iaut calling satu");  
+  return next();
+    
+ }{
+  console.log("iaut calling dua");
+    return res.json({ error: 'No credentials sent!' });
+  }
+}
+
+*/
+
+var login = require("./controllers/frmlogin");
+app.get('/login/:userlogin/:password', login.checklogin );
+app.get('/logout', (req,res) =>{
+
+    req.session = null;
+    res.redirect('/');
+
+});
 
 var menu = require("./menu");
-app.get('/', 	 (req, res) => res.render('home', menu(req) ));  
-app.get('/item', (req,res) => res.render('item', menu(req) ));
+app.get('/', 	 (req, res) => {
+     console.log(req.session);
+    // let _s = (...req.session);
+
+     if( req.session.login == null ){
+      res.render('login', menu(req) )
+     } else {
+      res.render('home', menu(req))
+     }
+     
+    });  
+app.get('/item', (req,res) => 
+{
+  console.log(req.session)
+  if( req.session.login == null ){   
+      res.redirect('/');
+  } else {
+      res.render('item', menu(req))
+  }
+
+});
 app.get('/trans', (req,res) => res.render('trans', menu(req) ));
+app.get('/auth', (req,res) =>
+ { 
+  console.log(req.session);
+  res.render('login', menu(req) )
+            
+       
+ });
+
 
 var frmitem = require("./controllers/frmitem")
-app.get('/data/item',  frmitem.itemData );
+app.get('/data/item' ,frmitem.itemData );
 app.post('/data/item', frmitem.itemSave );
 app.put('/data/item/:itemId', frmitem.itemUpdate );
 app.delete('/data/item/:itemId', frmitem.itemDelete);

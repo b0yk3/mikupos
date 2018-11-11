@@ -1,7 +1,7 @@
 <div id='grid-container'></div>
 <script>
-const urlhdata = "http://localhost:9829/data/htrans";
-const urlddata = "http://localhost:9829/data/dtrans";
+const urlhdata = "/data/htrans";
+const urlddata = "/data/dtrans";
 
 const formatangka = "1,111.00";
 const tinggi = 0;
@@ -19,7 +19,6 @@ webix.i18n.parseFormat  = "%Y-%m-%d";
 webix.i18n.setLocale("en-US");
 */
 
-
 var table1 =  { view:"datatable" ,
      // width: 400, 
       id : "table1" ,            
@@ -27,12 +26,13 @@ var table1 =  { view:"datatable" ,
       save: "rest->" + urlddata,
       math: true,
       select : true,
+      footer: true,
       columns: [
   { id: "pitemdesc" , width: 130,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
-  { id: "pitemprices" , format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
+  { id: "pitemprices" , footer: { content: "summColumn",template: "Total Jumlah : " }, format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
   { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Qty", sort: "int" },
-  { id: "total" ,  css:{'text-align':'right'}, format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:1] * [$r,:2]" },
-  { id: "desc" , header: "*Keterangan", editor: "text", fillspace: true }
+  { id: "total" ,  footer: { content: 'summColumn',css:{'text-align':'right'}}, css:{'text-align':'right'}, format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:1] * [$r,:2]" },
+  { id: "desc" , header: "*Keterangan", editor: "text", width: 100, fillspace: true }
                ]
     }
 
@@ -58,9 +58,8 @@ const klikdel = function(){
     
 const klikrefresh = function(){
   (function(f,l){
-    f.clear();
-    l.clearAll();
-    l.load(localurl);
+   f.clearAll();
+           f.load(urlddata + "/" + globalItemID);
       webix.message('data reload..');
   })($$("table1"),$$("lst1"));
 
@@ -88,13 +87,26 @@ const klikadd = function(){
 
 }
 
+const topdf = function(){
+
+   webix.toPDF($$("table1"),{
+   columns: {pitemdesc: true,
+     pitemprices: true,
+     qty: true,
+     total: true} ,  
+     filename : "mikucoffee"
+   }
+   );
+}
+
 const tb = {
     view:"toolbar",
     id:"myToolbar",
     cols:[      
       {view: "button" ,width:35 ,click: klikrefresh ,type: "iconButton", icon: "wxi-sync"},
       {view: "button" ,width:35 ,click: kliksave, type: "iconButton", icon: "wxi-check"},
-      {view: "button",width:35 ,click: klikdel, type: "iconButton", icon: "wxi-minus"},
+      {view: "button" ,width:35 ,click: klikdel, type: "iconButton", icon: "wxi-minus"},
+      {view: "button" ,width:35 ,click: topdf, type: "iconButton", icon: "wxi-download"},
       {template: "Pemeliharaan data penjualan.." , type:"section" , gravity: 0.2 }]
 }
 
@@ -126,11 +138,14 @@ const isi = { width: 600, type:"space" , rows:[atitle,table1,tb]}
 const frm1save = function(){
   
   (function(f,w,k){
-    webix.ajax().post(urlhdata,f.getValues());
-    webix.message('save');
-    w.hide();
-    k.clearAll();
-    k.load(urlhdata);
+    webix.ajax().post(urlhdata,f.getValues(), function(x) {
+     var xj = JSON.parse(x);
+     webix.message('Saved with transaction Id: ' + xj.id );
+     w.hide();
+     k.clearAll();
+     k.load(urlhdata);
+    }
+    );
 })($$("frmnewtrans"),$$("winnewtrans"),$$("kanban1"))
 }
 
@@ -190,6 +205,8 @@ webix.ui({
   id: "winnewtrans",
   top: 35,
   left: 280,
+  move: true,
+  modal: true,
   height: 350,
   widht: 300,
   body:  frmnewtrans,
@@ -221,18 +238,24 @@ webix.ui({
 
 webix.ready(function(){
 
- 
+/*
+
+assigment button edit click
+
+*/
+
 $$("kanban1").attachEvent("onListIconClick", function(iconId, itemId,ev,node,list){
      var durl = urlddata + "/" + itemId;
      $$("table1").clearAll();
      $$("table1").load(durl);
      globalItemID = itemId;
-   console.log(    $$("table1").data );
      $$("win1").show();
     return false;
 }); 
 
-
+/*
+  update status kanban
+*/
 $$("kanban1").attachEvent("onAfterStatusChange", function(itemId,status,list){
     webix.ajax().put(urlhdata + "/" + itemId , { status: status });
 });

@@ -1,13 +1,14 @@
 const Sequelize = require('sequelize');
 
-var sequelize = new Sequelize('dbpos001', 'root', '',{
+const sequelize = new Sequelize('dbpos001', 'root', '',{
   host:"localhost",
   dialect:"mysql"
 });
 
 const op = Sequelize.Op;
 
-var Item = sequelize.define( 'positem',
+
+let Item = sequelize.define( 'positem',
 {
   itemcode: Sequelize.STRING(10),
   itemdesc: Sequelize.STRING,
@@ -16,13 +17,13 @@ var Item = sequelize.define( 'positem',
   itemunit: Sequelize.STRING(3)
 });
 
-var Itemgrp = sequelize.define('posigrp',{
+let Itemgrp = sequelize.define('posigrp',{
     grpdesc: Sequelize.STRING
 });
 
 Item.belongsTo(Itemgrp)
 
-var Htrans = sequelize.define('poshtrans',{
+let Htrans = sequelize.define('poshtrans',{
     date: Sequelize.DATE,
     desc: Sequelize.STRING,
     status: Sequelize.STRING(5),
@@ -30,7 +31,7 @@ var Htrans = sequelize.define('poshtrans',{
     tags: Sequelize.STRING(3)
 });
 
-var Dtrans = sequelize.define('posdtrans',{
+let Dtrans = sequelize.define('posdtrans',{
     qty: Sequelize.NUMERIC,
     desc: Sequelize.STRING
 }); 
@@ -39,23 +40,29 @@ Dtrans.belongsTo(Item);
 Dtrans.belongsTo(Htrans);
 Htrans.hasMany(Dtrans);
 
-var User = sequelize.define('user', {
+let User = sequelize.define('user', {
   username: Sequelize.STRING,
-  birthday: Sequelize.DATE,
+  joindate: Sequelize.DATE,
   name: Sequelize.STRING,
   email: Sequelize.STRING,
-  age: Sequelize.INTEGER,
-  group_id: Sequelize.INTEGER
+  password: Sequelize.STRING(32)
 });
 
-
-  
+ 
 module.exports = {
  User, Item, Htrans, Dtrans, Itemgrp, op 
 };
 
+/*
 
 sequelize.sync({ force: true}).then( () => { 
+
+User.create({
+  username: "Admin",
+  password: "d8bd79cc131920d5de426f914d17405a", //min
+  joindate : "2018-01-01",
+  name: "Aa Admin"
+})
 
 Itemgrp.create({
    grpdesc: "beverage"
@@ -67,7 +74,16 @@ Itemgrp.create({
 
 Item.create({
   itemcode: "bean01",
-  itemdesc: "Espresso",
+  itemdesc: "Espresso (Double)",
+  itemprices: 22000,
+  itemhpp: 12000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+Item.create({
+  itemcode: "bean01",
+  itemdesc: "Espresso (Single)",
   itemprices: 15000,
   itemhpp: 10000,
   itemunit: "CUP",
@@ -76,7 +92,7 @@ Item.create({
 
 Item.create({
   itemcode: "bean02",
-  itemdesc: "Americano",
+  itemdesc: "Long Black (Americano)",
   itemprices: 15000,
   itemhpp: 10000,
   itemunit: "CUP",
@@ -85,7 +101,7 @@ Item.create({
 
 Item.create({
   itemcode: "bean03",
-  itemdesc: "V60 Arabica honey",
+  itemdesc: "Single Origin Natural",
   itemprices: 25000,
   itemhpp: 20000,
   itemunit: "CUP",
@@ -94,37 +110,95 @@ Item.create({
 
 Item.create({
   itemcode: "food01",
-  itemdesc: "Nasi Goreng",
-  itemprices: 25000,
+  itemdesc: "Cappucino",
+  itemprices: 18000,
   itemhpp: 20000,
-  itemunit: "SET",
-  posigrpId: 2
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+Item.create({
+  itemcode: "bean01",
+  itemdesc: "HOT Coffee Latte",
+  itemprices: 18000,
+  itemhpp: 10000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+Item.create({
+  itemcode: "bean01",
+  itemdesc: "Coffee Latte Ice",
+  itemprices: 20000,
+  itemhpp: 15000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+
+Item.create({
+  itemcode: "milk02",
+  itemdesc: "Milk Coffe Ice Miku (*)",
+  itemprices: 18000,
+  itemhpp: 15000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+Item.create({
+  itemcode: "hot01",
+  itemdesc: "Hot Chocolatte",
+  itemprices: 13000,
+  itemhpp: 10000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+
+Item.create({
+  itemcode: "bean01",
+  itemdesc: "Chocolatte Ice",
+  itemprices: 15000,
+  itemhpp: 10000,
+  itemunit: "CUP",
+  posigrpId: 1
+});
+
+Item.create({
+  itemcode: "bean01",
+  itemdesc: "HOT Tea (Lipton)",
+  itemprices: 10000,
+  itemhpp: 10000,
+  itemunit: "CUP",
+  posigrpId: 1
 });
 
 Item.create({
   itemcode: "food02",
   itemdesc: "Kentang Goreng",
-  itemprices: 20000,
+  itemprices: 15000,
   itemhpp: 12000,
   itemunit: "SET",
   posigrpId: 2
 });
 
-Htrans.create({
-  date: "2018-10-11",
-  desc: "test",
-  text: "data penjualan",
-  status: "new",
-  tags: "POS"
+Item.create({
+  itemcode: "food03",
+  itemdesc: "Nasi Goreng",
+  itemprices: 15000,
+  itemhpp: 10000,
+  itemunit: "SET",
+  posigrpId: 2
 });
 
-Dtrans.create({
-  poshtranId: "1",
-  positemId: "1",
-  qty: 10,
-  desc: "test data"
+Item.create({
+  itemcode: "food04",
+  itemdesc: "Roti Bakar",
+  itemprices: 15000,
+  itemhpp: 10000,
+  itemunit: "SET",
+  posigrpId: 2
 });
-
 
 
 
@@ -132,3 +206,4 @@ console.log('success')
 
 });
 
+*/

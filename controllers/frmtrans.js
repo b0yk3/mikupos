@@ -1,15 +1,16 @@
-var db = require("../models/posdb");
+const db = require("../models/posdb");
 
-var frmhtrans = function(req, res){
+let frmhtrans = function(req, res){
     db.Htrans.findAll().then( d => res.json(d))
 }
 
-var frmdtrans = function(req, res){
+let frmdtrans = function(req, res){
     var hid = req.params.transid;
     db.Dtrans.findAll({
         where: {poshtranId: hid},
         include:[
-            { model: db.Item ,             
+            { model: db.Item , 
+              attributes: ['itemdesc','itemprices'],            
               required: false
             }
         ]
@@ -17,17 +18,17 @@ var frmdtrans = function(req, res){
     .then( d => res.json(d))
 }
 
-var htranssave = function( req, res){
+let htranssave = function( req, res){
    console.log(req.body);
      db.Htrans.create(req.body).then( (o) => 
      res.json({ id: o.id}));
 }
 
-var getlasthid = function( req , res ){
+let getlasthid = function( req , res ){
     db.Htrans.max('id').then( d => res.json(d));
 }    
 
-var htransupdate = function( req, res ){
+let htransupdate = function( req, res ){
     var id = req.params.transid;
     db.Htrans.findById(id)
     .then((htrans) => htrans.update(req.body))
@@ -35,19 +36,19 @@ var htransupdate = function( req, res ){
     
 }
 
-var dtransupdate = function( req , res ){
+let dtransupdate = function( req , res ){
     db.Dtrans.findById(req.params.dtransid)
     .then((dtrans) => dtrans.update(req.body))
     .then(() => res.json({}));
 }
 
-var dtranssave = function( req, res){
+let dtranssave = function( req, res){
     console.log(req.body);
       db.Dtrans.create(req.body).then( (o) => 
       res.json({ id: o.id}));
  }
 
- var dtransdelete = function ( req, res ){
+ let dtransdelete = function ( req, res ){
     db.Dtrans.findById(req.params.dtransId)
       .then( (dtrans) => dtrans.destroy())
       .then( () => res.json({}));

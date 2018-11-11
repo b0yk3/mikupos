@@ -1,35 +1,35 @@
-var db = require("../models/posdb");
+const db = require("../models/posdb");
 
-var itemSave = function( req, res ){
+let itemSave = function( req, res ){
     console.log(req.body);
     db.Item.create(req.body).then( (o) => 
         res.json({ id: o.id})
     );
 } 
 
-var itemData = function(req, res){
+let itemData = function(req, res){
         db.Item.findAll().then( d => res.json(d))
 }
 
-var itemUpdate = function(req,res){
-    console.log( req.body)
+let itemUpdate = function(req,res){
+    console.log( req.body);
     var { itemcode, itemdesc, itemprices, itemhpp, itemunit, posigrpId } = req.body;
-    db.Item.findById(req.params.itemId)
+    db.Item.findByPk(req.params.itemId)
      .then((item) => item.update(req.body))
      .then(() => res.json({}));
 }
 
-var itemDelete = function ( req, res ){
+let itemDelete = function ( req, res ){
     db.Item.findById(req.params.itemId)
       .then( (item) => item.destroy())
       .then( () => res.json({}));
 }
 
-var itemgrpOptions = function(req, res){
+let itemgrpOptions = function(req, res){
     db.Itemgrp.findAll({ attributes: ["id", ["grpdesc", "value"]] }).then((data) => res.json(data));
 }
 
-var itemSearch = function(req, res){
+let itemSearch = function(req, res){
     var f = "%" + req.params.itemdesc + "%";
     db.Item.findAll({ attributes: ["id", ["itemdesc", "value"]],
                      where: { itemdesc: {[db.op.like] : f }} }).then((data) => res.json(data));
