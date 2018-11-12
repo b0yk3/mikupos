@@ -55,6 +55,7 @@ let logui = {
                                                                          webix.storage.cookie.put('login',resp);                                                                             
                                                                          component.enable();
                                                                          $$("logwin").close();
+                                                                         webix.send("/",{},"GET");
                                                                        });							
                                         
                                           

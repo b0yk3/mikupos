@@ -19,11 +19,11 @@ webix.i18n.parseFormat  = "%Y-%m-%d";
 webix.i18n.setLocale("en-US");
 */
 
-var table1 =  { view:"datatable" ,
+const table1 =  { view:"datatable" ,
      // width: 400, 
       id : "table1" ,            
       editable: true,
-      save: "rest->" + urlddata,
+      save:  "myProxy->" + urlddata,
       math: true,
       select : true,
       footer: true,
@@ -193,7 +193,7 @@ webix.ui({
                     { header: "Cancel",
                       body: {view: "kanbanlist", status:"cnl"}}            
                   ],
-         url: urlhdata,
+         url: "myProxy->" +urlhdata,
          id: "kanban1"
           }    
   ]

@@ -38,13 +38,7 @@ webix.proxy.myProxy = webix.extend({
 					   webix.ajax.$callback(view, callback, "", records, -1);
          }); 
      },
-		 save:function(view, update, dp, callback){
-        //your saving pattern for single records 
-				console.log(update.operation);              
-       // webix.ajax().headers({
-        //    "Authorization": "Bearer " + loginsession.token
-       //  }).post(this.source, update, callback);
-   
+		 save:function(view, update, dp, callback){       
       switch(update.operation){
 			 case "insert":
 			      delete update.data.id;
@@ -67,35 +61,25 @@ webix.proxy.myProxy = webix.extend({
 	  }
 }, webix.proxy.rest);
 
-	//	console.log(webix.proxy.rest);
-
 
 webix.ready(function(){
 	 
    
    
 	 if( !(loginsession == "undefined") )
-{
-	
-//	 webix.message(loginsession);
- 
- 
-
-   webix.attachEvent("onBeforeAjax", 
-	 function(mode, url, data, request, headers, files, promise)
+   {
+    webix.attachEvent("onBeforeAjax", 
+ 	  function(mode, url, data, request, headers, files, promise)
 	 {
-  	  headers["Authorization"] = "Bearer " + loginsession.token;
+  	headers["Authorization"] = "Bearer " + loginsession.token;
 	 });
 
-	} else {
-		alert( loginsession);
-	// webix.message(loginsession);
-	 console.log(loginsession);
-
+	}else{
+		alert( 'no auth detected ');
+	  console.log(loginsession);
 	}
 
 });
-	
 
 	</script>
 
