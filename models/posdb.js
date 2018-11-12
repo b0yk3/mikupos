@@ -10,11 +10,11 @@ const op = Sequelize.Op;
 
 let Item = sequelize.define( 'positem',
 {
-  itemcode: Sequelize.STRING(10),
   itemdesc: Sequelize.STRING,
   itemprices: Sequelize.DECIMAL(12,2),
   itemhpp: Sequelize.DECIMAL(12,2),
-  itemunit: Sequelize.STRING(3)
+  itemunit: Sequelize.STRING(3),
+  itemactive: Sequelize.BOOLEAN
 });
 
 let Itemgrp = sequelize.define('posigrp',{
@@ -25,7 +25,6 @@ Item.belongsTo(Itemgrp)
 
 let Htrans = sequelize.define('poshtrans',{
     date: Sequelize.DATE,
-    desc: Sequelize.STRING,
     status: Sequelize.STRING(5),
     text: Sequelize.TEXT,
     tags: Sequelize.STRING(3)
@@ -33,7 +32,8 @@ let Htrans = sequelize.define('poshtrans',{
 
 let Dtrans = sequelize.define('posdtrans',{
     qty: Sequelize.NUMERIC,
-    desc: Sequelize.STRING
+    price: Sequelize.NUMERIC,
+    ddesc: Sequelize.STRING
 }); 
 
 Dtrans.belongsTo(Item);
@@ -50,12 +50,21 @@ let User = sequelize.define('user', {
 
  
 module.exports = {
- User, Item, Htrans, Dtrans, Itemgrp, op 
+ User, Item, Htrans, Dtrans, Itemgrp, op, sequelize
 };
+
 
 /*
 
-sequelize.sync({ force: true}).then( () => { 
+let vtrans = `create or replace view _vtrans as 
+              select poshtranid,date,positemid,itemdesc,qty,price,qty*price hrgjual,status,text,tags,ddesc 
+              from posdtrans 
+              left join positems on positems.id=positemid 
+              left join poshtrans on poshtrans.id=poshtranid and status<>"cnl"`;
+
+sequelize.sync({ force: true}).then( (s) => { 
+
+s.query(vtrans);
 
 User.create({
   username: "Admin",
@@ -73,7 +82,6 @@ Itemgrp.create({
 })
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "Espresso (Double)",
   itemprices: 22000,
   itemhpp: 12000,
@@ -82,7 +90,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "Espresso (Single)",
   itemprices: 15000,
   itemhpp: 10000,
@@ -91,7 +98,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean02",
   itemdesc: "Long Black (Americano)",
   itemprices: 15000,
   itemhpp: 10000,
@@ -100,7 +106,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean03",
   itemdesc: "Single Origin Natural",
   itemprices: 25000,
   itemhpp: 20000,
@@ -109,7 +114,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "food01",
   itemdesc: "Cappucino",
   itemprices: 18000,
   itemhpp: 20000,
@@ -118,7 +122,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "HOT Coffee Latte",
   itemprices: 18000,
   itemhpp: 10000,
@@ -127,7 +130,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "Coffee Latte Ice",
   itemprices: 20000,
   itemhpp: 15000,
@@ -137,7 +139,6 @@ Item.create({
 
 
 Item.create({
-  itemcode: "milk02",
   itemdesc: "Milk Coffe Ice Miku (*)",
   itemprices: 18000,
   itemhpp: 15000,
@@ -146,7 +147,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "hot01",
   itemdesc: "Hot Chocolatte",
   itemprices: 13000,
   itemhpp: 10000,
@@ -156,7 +156,6 @@ Item.create({
 
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "Chocolatte Ice",
   itemprices: 15000,
   itemhpp: 10000,
@@ -165,7 +164,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "bean01",
   itemdesc: "HOT Tea (Lipton)",
   itemprices: 10000,
   itemhpp: 10000,
@@ -174,7 +172,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "food02",
   itemdesc: "Kentang Goreng",
   itemprices: 15000,
   itemhpp: 12000,
@@ -183,7 +180,6 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "food03",
   itemdesc: "Nasi Goreng",
   itemprices: 15000,
   itemhpp: 10000,
@@ -192,8 +188,15 @@ Item.create({
 });
 
 Item.create({
-  itemcode: "food04",
   itemdesc: "Roti Bakar",
+  itemprices: 15000,
+  itemhpp: 10000,
+  itemunit: "SET",
+  posigrpId: 2
+});
+
+Item.create({  
+  itemdesc: "Aneka Cemilan",
   itemprices: 15000,
   itemhpp: 10000,
   itemunit: "SET",
@@ -205,5 +208,4 @@ Item.create({
 console.log('success')
 
 });
-
 */

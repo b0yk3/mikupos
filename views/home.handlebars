@@ -1,9 +1,94 @@
-<h3>Hi!</h3>
+<div id='grid-container'></div>
+<script>
+const doptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const formatdate = webix.Date.dateToStr("%Y-%m-%d");
+const tglhariini = new Date();
+const tgli = tglhariini.toLocaleDateString("id-US",doptions);
+const textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
+<p>Contact WA: 0812 800 88681</p>
+`
+const tgliso = formatdate(tglhariini);
 
-<p> Selamat Datang di program penjualan miko coffee  </p>
-
-<p> Silahkan pilih menu di samping sebelah kiri </p>
-
-<p> Untuk informasi silahkan hubungi wa 0812 80088681</p>
+const urldaysale = "/data/view/sales/"+tgliso;
+const urldaytrans = "/data/view/itemtrans/"+tgliso;
 
 
+const dvfunc = function(obj){
+  let hasil = "";
+  hasil = "ID : " + obj.id + "<div class=\"webix_strong\">" + obj.text + "</div>";
+  hasil = hasil + "Status : " + obj.status + "<br>";
+  hasil = hasil + "Jumlah : " + obj.jmlitems + "<br>";
+  hasil = hasil + "Total : " + webix.i18n.numberFormat(obj.total)  
+  return hasil;
+}
+
+const clmn =
+      [ {id: "tgl", widht: 100, header : "Tanggal" },
+        {id: "itemdesc", width:200,header: "Nama Item"},
+        {id: "qty",  css:{'text-align':'right'}, header : { text: "Qty", css:{'text-align':'right'} } },
+        {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , numberFormat: "1,111.00",css:{'text-align':'right'}},
+        {id: "total" , header: { text: "Total", css:{'text-align':'right'} }, numberFormat: "1,111.00", css:{'text-align':'right'}}
+      ]
+
+const barline =
+      {
+  view:"chart",
+  width:600,
+  height:250,
+  type:"bar",
+  value:"#qty#",
+  item:{
+    borderColor: "#1293f8",
+    color: "#ffffff"
+  },
+  line:{
+    color:"#1293f8",
+    width:3
+  },
+  xAxis:{
+    template:"'#id#"
+  },
+  offset:0,
+  yAxis:{
+    start:0,
+    end:20,
+    step:2,
+    template:function(obj){
+      return (obj%20?"":obj)
+    }
+  },
+  url: "myProxy->"+urldaytrans
+}
+
+let dtshow =
+    { view: "dataview",
+      url: "myProxy->"+urldaysale, 
+      xcount: 5,
+      ycount: 2,
+     type: { width: 122, height: 150 },
+     template : dvfunc, 
+    }
+
+let viewall =
+    { view: "datatable",
+      url: "myProxy->"+urldaytrans,
+      columns: clmn }
+    
+
+webix.ui({
+  view: "dashboard",
+  container: "grid-container",
+  height: 600,
+  gridColumns: 4,
+  cells: [{view: "panel", header: "Penjualan hari ini", 
+           x:0 , y:0 , dx:1, dy:1, 
+           body: dtshow},
+          {view: "panel", header: "Graphic Penjualan", x:1 , y:0 , dx:3, dy:1, 
+           body: barline },
+          {view: "panel", x:0 , y:1 , dx:1, dy:2, body: {template: textemplate}},
+          {view: "panel", x:1 , y:1 , dx:3, dy:1, body: viewall },
+         ]
+});
+
+
+</script>

@@ -12,7 +12,9 @@ const bars = exphbs({
 })
 
 const auth = jwt({ secret: 'harussudahd13ncrypted', requestProperty: 'auth'})
-.unless({ path: ["/favicon.ico","/","/logout", "/item","/trans","/auth" , /^\/login\/.*/]  });
+.unless({ path:  ["/favicon.ico","/","/logout", 
+                  "/item","/trans", // /^\/data\/view\/.*/ ,
+                  "/auth" , /^\/login\/.*/]  });
 
 // Generate valid JWT
 // console.log(jsonwebtoken.sign({ foo: 'bar' }, 'thisIsSecret'));
@@ -75,7 +77,7 @@ var iauth = function(req, res, next){
 
 */
 
-var login = require("./controllers/frmlogin");
+let login = require("./controllers/frmlogin");
 app.get('/login/:userlogin/:password', login.checklogin );
 app.get('/logout', (req,res) =>{
 
@@ -84,7 +86,7 @@ app.get('/logout', (req,res) =>{
 
 });
 
-var menu = require("./menu");
+let menu = require("./menu");
 app.get('/', 	 (req, res) => {
      console.log(req.session);
     // let _s = (...req.session);
@@ -106,7 +108,16 @@ app.get('/item', (req,res) =>
   }
 
 });
-app.get('/trans', (req,res) => res.render('trans', menu(req) ));
+app.get('/trans', (req,res) => 
+{ 
+  console.log(req.session)
+  if( req.session.login == null ){   
+      res.redirect('/');
+  } else {
+      res.render('trans', menu(req))
+}
+});
+
 app.get('/auth', (req,res) =>
  { 
   console.log(req.session);
@@ -116,7 +127,7 @@ app.get('/auth', (req,res) =>
  });
 
 
-var frmitem = require("./controllers/frmitem")
+let frmitem = require("./controllers/frmitem")
 app.get('/data/item' ,frmitem.itemData );
 app.post('/data/item', frmitem.itemSave );
 app.put('/data/item/:itemId', frmitem.itemUpdate );
@@ -125,7 +136,7 @@ app.delete('/data/item/:itemId', frmitem.itemDelete);
 app.get('/data/itemopt' , frmitem.itemgrpOptions);
 app.get('/data/itemfinder/:itemdesc' , frmitem.itemSearch);
 
-var frmtrans = require("./controllers/frmtrans");
+let frmtrans = require("./controllers/frmtrans");
 app.get('/data/htrans', frmtrans.frmhtrans );
 app.get('/data/dtrans/:transid', frmtrans.frmdtrans );
 
@@ -138,7 +149,13 @@ app.post('/data/dtrans', frmtrans.dtranssave );
 app.put('/data/dtrans/:dtransid', frmtrans.dtransupdate );
 app.delete('/data/dtrans/:dtransId', frmtrans.dtransdelete);
 
+let dashboard = require("./controllers/dashboard");
+app.get('/data/view/trans/:tgl', dashboard.daytrans );
+app.get('/data/view/itemtrans/:tgl', dashboard.dailyitems );
+app.get('/data/view/sales/:tgl', dashboard.dailysale);
+
 
 console.log("app start on port : 9829 ");
 
 app.listen(9829);
+1111

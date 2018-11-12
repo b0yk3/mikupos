@@ -31,8 +31,9 @@ const table1 =  { view:"datatable" ,
   { id: "pitemdesc" , width: 130,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
   { id: "pitemprices" , footer: { content: "summColumn",template: "Total Jumlah : " }, format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
   { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Qty", sort: "int" },
+  { id: "price" ,  css:{'text-align':'right'}, editor: "text", header: "*Harga jual", sort: "int" },
   { id: "total" ,  footer: { content: 'summColumn',css:{'text-align':'right'}}, css:{'text-align':'right'}, format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:1] * [$r,:2]" },
-  { id: "desc" , header: "*Keterangan", editor: "text", width: 100, fillspace: true }
+  { id: "ddesc" , header: "*Keterangan", editor: "text", width: 100, fillspace: true }
                ]
     }
 
@@ -59,7 +60,7 @@ const klikdel = function(){
 const klikrefresh = function(){
   (function(f,l){
    f.clearAll();
-           f.load(urlddata + "/" + globalItemID);
+      f.load(urlddata + "/" + globalItemID);
       webix.message('data reload..');
   })($$("table1"),$$("lst1"));
 
@@ -69,12 +70,14 @@ const klikrefresh = function(){
 const klikadd = function(){
   
   (function(f,t){
-      var pilih = t.data.value;
+      let pilih = t.data.value;
       webix.ajax("/data/itemfinder/"+pilih,function(text,data){
-           var hasil_id = data.json()[0].id;
+           let hasil_id = data.json()[0].id;
+           let hasil_harga = data.json()[0].harga;
            webix.ajax().post(urlddata ,
              { poshtranId : globalItemID, 
                positemId : hasil_id ,
+               price: hasil_harga,
                qty : 1
              }
            );
@@ -92,6 +95,7 @@ const topdf = function(){
    webix.toPDF($$("table1"),{
    columns: {pitemdesc: true,
      pitemprices: true,
+     price: true,
      qty: true,
      total: true} ,  
      filename : "mikucoffee"
@@ -169,7 +173,7 @@ const kliknewtrans = function()
 {
   (function(w,f){
     f.clear();
-    f.setValues({ status : "new", tags : "" });
+    f.setValues({ status : "new", tags : "B" });
     w.show();
 
   })($$("winnewtrans"),$$("frmnewtrans"));

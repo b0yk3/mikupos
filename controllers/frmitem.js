@@ -31,7 +31,7 @@ let itemgrpOptions = function(req, res){
 
 let itemSearch = function(req, res){
     var f = "%" + req.params.itemdesc + "%";
-    db.Item.findAll({ attributes: ["id", ["itemdesc", "value"]],
+    db.Item.findAll({ attributes: ["id", ["itemdesc", "value"], ["itemprices","harga"]],
                      where: { itemdesc: {[db.op.like] : f }} }).then((data) => res.json(data));
 }
 
