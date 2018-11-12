@@ -29,10 +29,12 @@ const table1 =  { view:"datatable" ,
       footer: true,
       columns: [
   { id: "pitemdesc" , width: 130,header: "Makanan/Minuman" , map: "#positem.itemdesc#"  },
-  { id: "pitemprices" , footer: { content: "summColumn",template: "Total Jumlah : " }, format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
+  { id: "pitemprices" , footer: { content: "summColumn",template: "Total Jumlah : " }, 
+                 format:webix.i18n.numberFormat, css:{'text-align':'right'}, header: "Harga" , map: "#positem.itemprices#" },
   { id: "qty" ,  css:{'text-align':'right'}, editor: "text", header: "*Qty", sort: "int" },
-  { id: "price" ,  css:{'text-align':'right'}, editor: "text", header: "*Harga jual", sort: "int" },
-  { id: "total" ,  footer: { content: 'summColumn',css:{'text-align':'right'}}, css:{'text-align':'right'}, format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:1] * [$r,:2]" },
+  { id: "price", css:{'text-align':'right'}, editor: "text", header: "*Harga jual", sort: "int" },
+  { id: "total", footer: { content: 'summColumn',css:{'text-align':'right'}}, css:{'text-align':'right'}, 
+                 format:webix.i18n.numberFormat, header: "Jumlah", math:"[$r,:2] * [$r,:3]" },
   { id: "ddesc" , header: "*Keterangan", editor: "text", width: 100, fillspace: true }
                ]
     }

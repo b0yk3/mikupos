@@ -13,7 +13,7 @@
 	<script type="text/javascript">
 
 
-	function detectmob() {
+   function detectmob() {
    if(window.innerWidth <= 800 && window.innerHeight <= 600) {
      return true;
    } else {
@@ -22,13 +22,20 @@
 
 	}
 
-let loginsession = JSON.parse(webix.storage.cookie.get("login")) || {token : ""};
+const doptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const formatdate = webix.Date.dateToStr("%Y-%m-%d");
+const tglhariini = new Date();
+const tgli = tglhariini.toLocaleDateString("id-US",doptions);
+const tgliso = formatdate(tglhariini);
+
+
+
+const loginsession = JSON.parse(webix.storage.cookie.get("login")) || {token : ""};
 
 let logintoken = {
                    "Authorization": "Bearer " + loginsession.token
                  } ;
 
-								 
 webix.proxy.myProxy = webix.extend({
     load:function(view, callback){
 			   webix.ajax().headers({
@@ -64,7 +71,7 @@ webix.proxy.myProxy = webix.extend({
 
 webix.ready(function(){
 	 
-   
+     document.getElementById("leftmenu").hidden = detectmob();
    
 	 if( !(loginsession == "undefined") )
    {

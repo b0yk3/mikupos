@@ -1,18 +1,33 @@
 <div id='grid-container'></div>
 <script>
-const doptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-const formatdate = webix.Date.dateToStr("%Y-%m-%d");
-const tglhariini = new Date();
-const tgli = tglhariini.toLocaleDateString("id-US",doptions);
-const userlogin = JSON.parse(webix.storage.cookie.get("login"));
+function initial(str){
+  const regex = /(\w)\w*/gm;
+  let m;
+  let hasil = '';
+
+  while ((m = regex.exec(str)) !== null) {
+	  if (m.index === regex.lastIndex) {
+	           regex.lastIndex++;
+             }
+	  m.forEach((match, groupIndex) => {
+		if( match.length == 1 ) {
+		 hasil = hasil + match;
+		}
+	 //  console.log(`Found match, group ${groupIndex}: ${match}`);
+	      });
+
+
+  } 
+ return hasil;
+}
+
 const textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
 <p>Contact WA: 0812 800 88681</p>
-<p>User : ${userlogin.name}</p>
+<p>User : ${loginsession.name}</p>
 `
-const tgliso = formatdate(tglhariini);
 
-const urldaysale = "/data/view/sales/"+tgliso;
-const urldaytrans = "/data/view/itemtrans/"+tgliso;
+const urldaysale = "/data/view/sales/";
+const urldaytrans = "/data/view/itemtrans/";
 
 
 const dvfunc = function(obj){
@@ -27,18 +42,23 @@ const dvfunc = function(obj){
 const clmn =
       [ {id: "tgl", widht: 100, header : "Tanggal" },
         {id: "itemdesc", width:200,header: "Nama Item"},
-        {id: "qty",  css:{'text-align':'right'}, header : { text: "Qty", css:{'text-align':'right'} } },
+        {id: "qty",  css:{'text-align':'right'},  footer: { content: 'summColumn',css:{'text-align':'right'}},
+                     header : { text: "Qty", css:{'text-align':'right'} } },
         {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , numberFormat: "1,111.00",css:{'text-align':'right'}},
-        {id: "total" , header: { text: "Total", css:{'text-align':'right'} }, numberFormat: "1,111.00", css:{'text-align':'right'}}
+        {id: "total" , header: { text: "Total", css:{'text-align':'right'} }, 
+         footer: { content: 'summColumn',css:{'text-align':'right'}},
+         numberFormat: "1,111.00", css:{'text-align':'right'}}
       ]
 
 const barline =
       {
   view:"chart",
-  width:600,
-  height:250,
-  type:"bar",
-  value:"#qty#",
+  id: "barchart",
+  width:300,
+  height:220,
+  type:"line",
+  value:"#total#",
+  tooltip: { template: "#itemdesc#" },
   item:{
     borderColor: "#1293f8",
     color: "#ffffff"
@@ -48,23 +68,27 @@ const barline =
     width:3
   },
   xAxis:{
-    template:"'#id#"
+    template: function(obj){
+      return initial(obj.itemdesc);
+    }
   },
   offset:0,
   yAxis:{
-    start:0,
-    end:20,
-    step:2,
+    start: 5000,
+    end: 105000,
+    step:10000,
     template:function(obj){
       return (obj%20?"":obj)
     }
   },
-  url: "myProxy->"+urldaytrans
+  url: "myProxy->"+urldaytrans+tgliso
 }
+
 
 let dtshow =
     { view: "dataview",
-      url: "myProxy->"+urldaysale, 
+      id: 'dtshow',
+      url: "myProxy->"+urldaysale+tgliso, 
       xcount: 5,
       ycount: 2,
      type: { width: 122, height: 150 },
@@ -73,15 +97,18 @@ let dtshow =
 
 let viewall =
     { view: "datatable",
-      url: "myProxy->"+urldaytrans,
+      id : "viewtrans",
+      url: "myProxy->"+urldaytrans+tgliso,
+      footer: true,
+      math: true,
       columns: clmn }
     
 
-webix.ui({
-  view: "dashboard",
-  container: "grid-container",
-  height: 600,
+let dashboard = {
+  view: "dashboard",  
   gridColumns: 4,
+  id : "dashboard1",
+  height: 560,
   cells: [{view: "panel", header: "Penjualan hari ini", 
            x:0 , y:0 , dx:1, dy:1, 
            body: dtshow},
@@ -90,6 +117,42 @@ webix.ui({
           {view: "panel", x:0 , y:1 , dx:1, dy:2, body: {template: textemplate}},
           {view: "panel", x:1 , y:1 , dx:3, dy:1, body: viewall },
          ]
+}
+
+const topdf = function(){
+  webix.toExcel($$("viewtrans"));
+}
+
+let tb = 
+{ view: "toolbar",
+  id: "tb1",
+  cols : [{ view: "text", width: 200, text: "Silahkan pilih Tanggal : "} , 
+          { view: "datepicker", id: "tglpilih" , value : tglhariini , width: 120 },
+          { view: "button" ,width:35 , click: topdf, type: "iconButton", icon: "wxi-download"},
+           ]}
+
+webix.ui({
+  view: "panel",
+  container: "grid-container",
+  height: 600,
+  rows : [tb,dashboard]
+})
+
+webix.ready(function(){
+$$("tglpilih").attachEvent("onChange", function(newv, oldv){
+    let tgl = formatdate(newv);
+    $$("barchart").clearAll();
+    $$("barchart").load("myProxy->"+urldaytrans+tgl)
+
+    $$("dtshow").clearAll();
+    $$("dtshow").load("myProxy->"+urldaysale+tgl);
+
+    $$("viewtrans").clearAll();
+    $$("viewtrans").load("myProxy->"+urldaytrans+tgl)
+
+});
+
+
 });
 
 
