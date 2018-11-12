@@ -41,7 +41,7 @@ const dvfunc = function(obj){
 
 const clmn =
       [ {id: "tgl", widht: 100, header : "Tanggal" },
-        {id: "itemdesc", width:200,header: "Nama Item"},
+        {id: "itemdesc", width:200,header: "Nama Item", template: function(obj){return obj.itemdesc + " (" + initial(obj.itemdesc) + ")"}},
         {id: "qty",  css:{'text-align':'right'},  footer: { content: 'summColumn',css:{'text-align':'right'}},
                      header : { text: "Qty", css:{'text-align':'right'} } },
         {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , numberFormat: "1,111.00",css:{'text-align':'right'}},
