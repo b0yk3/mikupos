@@ -4,8 +4,10 @@ const doptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeri
 const formatdate = webix.Date.dateToStr("%Y-%m-%d");
 const tglhariini = new Date();
 const tgli = tglhariini.toLocaleDateString("id-US",doptions);
+const userlogin = JSON.parse(webix.storage.cookie.get("login"));
 const textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
 <p>Contact WA: 0812 800 88681</p>
+<p>User : ${userlogin.name}</p>
 `
 const tgliso = formatdate(tglhariini);
 

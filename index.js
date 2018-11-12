@@ -157,5 +157,4 @@ app.get('/data/view/sales/:tgl', dashboard.dailysale);
 
 console.log("app start on port : 9829 ");
 
-app.listen(9829);
-1111
+app.listen(9829,"127.0.0.1");
