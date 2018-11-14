@@ -6,6 +6,8 @@ const cookieSession = require('cookie-session');
 const jwt = require('express-jwt');
 const jsonwebtoken = require('jsonwebtoken');
 
+const minify = require('express-minify');
+
 const app = express();
 const bars = exphbs({ 
 	defaultLayout: 'main'
@@ -19,7 +21,10 @@ const auth = jwt({ secret: 'harussudahd13ncrypted', requestProperty: 'auth'})
 // Generate valid JWT
 // console.log(jsonwebtoken.sign({ foo: 'bar' }, 'thisIsSecret'));
 
+app.use(minify());
+
 app.engine('handlebars', bars)
+
 app.set('view engine', 'handlebars')
 
 app.use(bodyParser.urlencoded({ extended: false }))
