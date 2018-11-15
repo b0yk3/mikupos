@@ -23,7 +23,9 @@ const table1 =  { view:"datatable" ,
      // width: 400, 
       id : "table1" ,            
       editable: true,
-      save:  "myProxy->" + urlddata,
+      save:  { url: "myProxy->" + urlddata,
+               autoupdate: true
+      },
       math: true,
       select : true,
       footer: true,
@@ -43,9 +45,9 @@ const table1 =  { view:"datatable" ,
 const kliksave = function(){
   
   (function(f){
-    f.save().then( () =>
-    webix.message('data saved'));
-  })($$("table1"));
+     f.send();
+     webix.message('data saved');
+  })(webix.dp($$("table1")));
 
 }
 
@@ -61,7 +63,7 @@ const klikdel = function(){
     
 const klikrefresh = function(){
   (function(f,l){
-   f.clearAll();
+      f.clearAll();
       f.load(urlddata + "/" + globalItemID);
       webix.message('data reload..');
   })($$("table1"),$$("lst1"));
@@ -82,10 +84,12 @@ const klikadd = function(){
                price: hasil_harga,
                qty : 1
              }
-           );
-           f.clearAll();
-           f.load(urlddata + "/" + globalItemID);
-           t.setValue("");
+           ).then( () => {
+            f.clearAll();
+            f.load(urlddata + "/" + globalItemID);
+            t.setValue("");
+            webix.message("Data saved..");
+           });
       });
   })($$("table1"),$$("cari"))
   

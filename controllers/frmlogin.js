@@ -10,7 +10,7 @@ let checklogin = function ( req, res ){
       attributes : [ 'name', 'password' ]
     }).then(function(u){
   //    console.log(u);
-      console.log(req.session);
+  //    console.log(req.session);
      if( u == null ){
         req.session = null;
         res.json({ error: 'There is not valid users using that name!'});

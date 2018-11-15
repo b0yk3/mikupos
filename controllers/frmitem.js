@@ -32,7 +32,7 @@ let itemgrpOptions = function(req, res){
 let itemSearch = function(req, res){
     var f = "%" + req.params.itemdesc + "%";
     db.Item.findAll({ attributes: ["id", ["itemdesc", "value"], ["itemprices","harga"]],
-                     where: { itemdesc: {[db.op.like] : f }} }).then((data) => res.json(data));
+                     where: { itemdesc: {[db.Op.like] : f }} }).then((data) => res.json(data));
 }
 
 module.exports = { itemSave, itemData, itemUpdate, itemDelete , itemgrpOptions, itemSearch }
