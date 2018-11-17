@@ -23,7 +23,7 @@ const table1 =  { view:"datatable" ,
      // width: 400, 
       id : "table1" ,            
       editable: true,
-      save:  { url: "myProxy->" + urlddata,
+      save:  { url: "myProxy->" + urlddata  ,
                autoupdate: true
       },
       math: true,
@@ -179,31 +179,43 @@ const kliknewtrans = function()
 {
   (function(w,f){
     f.clear();
-    f.setValues({ status : "new", tags : "B" });
+    f.setValues({ status : "new", tags : "B" , "date" : $$("tgltoday").getValue() });
     w.show();
 
   })($$("winnewtrans"),$$("frmnewtrans"));
 }
 
+const tbtrans = { view: "toolbar" , id: "tb1", height: 40, 
+                  cols: [{view: "datepicker", timepicker: true, value: tglhariini, id: "tgltoday", width: 120},
+                         {view: "button" , click: kliknewtrans, width: 35, type: "iconButton" , icon: "wxi-plus"},
+                         {type: "section" , template: "Transaksi Penjualan - silahkan klik tombol [ + ] untuk data baru "}]}
 
+  webix.type(webix.ui.kanbanlist,{
+    name: "cards",
+    minHeight: 80,
+    templateBody: function(obj){
+      let html = "<b>"
+      html += obj.text + "</b><br>Jumlah :&nbsp;&nbsp;<b>" +  webix.i18n.numberFormat(obj.jmltotal) +"</b>";
+      return html;
+    }
+  });
 
 webix.ui({
       container: "grid-container",
-      height: 600,
-      rows:[{ view: "toolbar" , id: "tb1", height: 40, 
-            cols: [{view: "button" , click: kliknewtrans, width: 35, type: "iconButton" , icon: "wxi-plus"},
-            {type: "section" , template: "Transaksi Penjualan - silahkan klik tombol [ + ] untuk data baru "}]},
+      minHeight: 600,
+      minWidth: 450,
+      rows:[tbtrans,
             {view: "kanban" , type: "space" ,
              cols: [{ header: "Pesanan",
-                      body: { view: "kanbanlist", status:"new"}},
+                      body: { view: "kanbanlist", status:"new", type: "cards" }},
                     { header: "Antaran",
-                      body: {view: "kanbanlist", status:"srv"}},
+                      body: {view: "kanbanlist", status:"srv" , type: "cards"}},
                     { header: "Bayar",
-                      body: {view: "kanbanlist", status:"end"}},
+                      body: {view: "kanbanlist", status:"end", type: "cards"}},
                     { header: "Cancel",
                       body: {view: "kanbanlist", status:"cnl"}}            
                   ],
-         url: "myProxy->" +urlhdata,
+         url: "myProxy->" +urlhdata +"/"+ formatdate(tglhariini),
          id: "kanban1"
           }    
   ]
@@ -248,6 +260,8 @@ webix.ui({
 
 webix.ready(function(){
 
+
+
 /*
 
 assigment button edit click
@@ -270,6 +284,20 @@ $$("kanban1").attachEvent("onAfterStatusChange", function(itemId,status,list){
     webix.ajax().put(urlhdata + "/" + itemId , { status: status });
 });
 
+
+/*
+ 
+ filter date
+
+*/
+
+$$("tgltoday").attachEvent("onChange", function(newv, oldv){
+    let tgl = "myProxy->" + urlhdata + "/" + formatdate(newv);
+    $$("kanban1").clearAll();
+    $$("kanban1").load(tgl);
+
+
+});
 
 });
 </script>

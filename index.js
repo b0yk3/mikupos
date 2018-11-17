@@ -143,6 +143,7 @@ app.get('/data/itemfinder/:itemdesc' , frmitem.itemSearch);
 
 let frmtrans = require("./controllers/frmtrans");
 app.get('/data/htrans', frmtrans.frmhtrans );
+app.get('/data/htrans/:tgl' , frmtrans.frmhtransdate );
 app.get('/data/dtrans/:transid', frmtrans.frmdtrans );
 
 app.get('/data/htrans/getlast/id', frmtrans.getlasthid );

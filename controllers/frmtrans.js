@@ -4,8 +4,19 @@ let frmhtrans = function(req, res){
     db.Htrans.findAll().then( d => res.json(d))
 }
 
+let frmhtransdate = function(req, res){
+  let tgl= req.params.tgl || "2018-11-10";
+    let sql= `select a.*,(select sum(price*qty) from posdtrans b where b.poshtranId=a.id) jmltotal from poshtrans a
+    where DATE(a.date)="${tgl}"`;
+
+    db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT})
+    .then( xobj => {
+     res.json(xobj);
+  })
+}
+
 let frmdtrans = function(req, res){
-    var hid = req.params.transid;
+    let hid = req.params.transid;
     db.Dtrans.findAll({
         where: {poshtranId: hid},
         include:[
@@ -54,5 +65,5 @@ let dtranssave = function( req, res){
       .then( () => res.json({}));
 }
 
-module.exports = { frmdtrans, frmhtrans, htranssave, getlasthid, dtransdelete,
+module.exports = { frmdtrans, frmhtrans, frmhtransdate, htranssave, getlasthid, dtransdelete,
                    htransupdate,dtransupdate, dtranssave }
