@@ -67,12 +67,9 @@ const klikrefresh = function(){
       f.load(urlddata + "/" + globalItemID);
       webix.message('data reload..');
   })($$("table1"),$$("lst1"));
-
-
 }
 
-const klikadd = function(){
-  
+const klikadd = function(){  
   (function(f,t){
       let pilih = t.data.value;
       webix.ajax("/data/itemfinder/"+pilih,function(text,data){
@@ -95,7 +92,6 @@ const klikadd = function(){
   
 
 }
-
 const topdf = function(){
 
    webix.toPDF($$("table1"),{
@@ -139,11 +135,7 @@ const atitle = {view: "toolbar",
 
 const afooter = {template: " " , type: "footer"}
 
-
-
 const isi = { width: 600, type:"space" , rows:[atitle,table1,tb]}   
-
-
 
 const frm1save = function(){
   
@@ -153,7 +145,7 @@ const frm1save = function(){
      webix.message('Saved with transaction Id: ' + xj.id );
      w.hide();
      k.clearAll();
-     k.load(urlhdata);
+     k.load(urlhdata+"/"+ formatdate(tglhariini));
     }
     );
 })($$("frmnewtrans"),$$("winnewtrans"),$$("kanban1"))
@@ -195,7 +187,7 @@ const tbtrans = { view: "toolbar" , id: "tb1", height: 40,
     minHeight: 80,
     templateBody: function(obj){
       let html = "<b>"
-      html += obj.text + "</b><br>Jumlah :&nbsp;&nbsp;<b>" +  webix.i18n.numberFormat(obj.jmltotal) +"</b>";
+      html += obj.text + "</b><br>Jumlah :&nbsp;&nbsp;<b>" +  webix.i18n.numberFormat(obj.jmltotal || 0) +"</b>";
       return html;
     }
   });
@@ -222,6 +214,8 @@ webix.ui({
   });
 
 
+
+
 webix.ui({
   view: "window",
   id: "winnewtrans",
@@ -240,6 +234,15 @@ webix.ui({
   }
 });
 
+let winhide = function(){
+     (function(w,k){
+      w.hide();
+      k.clearAll();
+      k.load(urlhdata+"/"+ formatdate(tglhariini));
+     }
+     )($$("win1"),$$("kanban1"));
+}
+
 webix.ui({
   view: "window",
   id: "win1",
@@ -253,7 +256,7 @@ webix.ui({
   head:{
     view:"toolbar", cols:[
       {view:"label", label: "Data Penjualan" },
-      {view:"button", type: "iconButton" , width: 30, icon: "wxi-close", align: 'right', click:"$$('win1').hide();"}
+      {view:"button", type: "iconButton" , width: 30, icon: "wxi-close", align: 'right', click: winhide}
     ]
   }
 });
