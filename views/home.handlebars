@@ -25,35 +25,25 @@ const urldaysale = "/data/view/sales/";
 const urldaytrans = "/data/view/itemtrans/";
 const urlsumsales = "/data/view/sumsales/";
 
-let datajual = function(){
-  
-  webix.ajax().headers(logintoken).get(urlsumsales + tgliso , function(resp){
-     let dt=  JSON.parse(resp);
-     let hasil = webix.i18n.numberFormat(dt[0].sales || 0);
-     
-    return hasil;
-  });
-  
-           
-  
-}
-
+/*
 let textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
 <p>Contact WA: 0812 800 88681</p>
 <p>User : ${loginsession.name}</p>
 <Br>`
+*/
 
 const dtviewsalestemplate = (obj) => {
   let hasil = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
 <p>Contact WA: 0812 800 88681</p>
 <p>User : ${loginsession.name}</p>
-<Br>`
- hasil += "Total : " + webix.i18n.numberFormat(obj.sales || 0);
+`
+ hasil += "Total : <b>" + webix.i18n.numberFormat(obj.sales || 0) + "</b>";
  return hasil;     
 }
 
 const dtviewsales =
- { view: "dataview", 
+ { view: "dataview",
+   id: "dtviewsales", 
    url: "myProxy->" + urlsumsales + tgliso , 
    template: dtviewsalestemplate,
    type: { width: 150, height: 250 } };
@@ -72,12 +62,12 @@ const clmn =
         {id: "itemdesc", width:200,header: "Nama Item", 
                      template: function(obj){return obj.itemdesc + " (" + initial(obj.itemdesc) + ")"}},
         {id: "qty",  css:{'text-align':'right'},  footer: { content: 'summColumn',css:{'text-align':'right'}},
-                     header : { text: "Qty", css:{'text-align':'right'} } },
+                     header : { text: "Qty", css:{'text-align':'right'} }, sort: "int" },
         {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , 
-                     numberFormat: "1,111.00",css:{'text-align':'right'}},
+                     numberFormat: "1,111.00",css:{'text-align':'right'}, sort: "int"},
         {id: "total" , header: { text: "Total", css:{'text-align':'right'} }, 
          footer: { content: 'summColumn',css:{'text-align':'right'}},
-         numberFormat: "1,111.00", css:{'text-align':'right'}}
+         numberFormat: "1,111.00", css:{'text-align':'right'}, sort: "int"}
       ]
 
 const barline =
@@ -181,6 +171,8 @@ $$("tglpilih").attachEvent("onChange", function(newv, oldv){
     $$("viewtrans").clearAll();
     $$("viewtrans").load("myProxy->"+urldaytrans+tgl)
 
+    $$("dtviewsales").clearAll();
+    $$("dtviewsales").load("myProxy->" + urlsumsales + tgl);
     
 });
 
