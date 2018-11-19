@@ -139,16 +139,16 @@ const isi = { width: 600, type:"space" , rows:[atitle,table1,tb]}
 
 const frm1save = function(){
   
-  (function(f,w,k){
-    webix.ajax().post(urlhdata,f.getValues(), function(x) {
+  (function(f,w,k,d){
+     webix.ajax().post(urlhdata,f.getValues(), function(x) {
      var xj = JSON.parse(x);
      webix.message('Saved with transaction Id: ' + xj.id );
      w.hide();
      k.clearAll();
-     k.load(urlhdata+"/"+ formatdate(tglhariini));
+     k.load(urlhdata+"/"+ formatdate(d.getValue()));
     }
     );
-})($$("frmnewtrans"),$$("winnewtrans"),$$("kanban1"))
+})($$("frmnewtrans"),$$("winnewtrans"),$$("kanban1"),$$("tgltoday"))
 }
 
 const frmnewtrans =  { view:"form" ,
@@ -213,9 +213,6 @@ webix.ui({
   ]
   });
 
-
-
-
 webix.ui({
   view: "window",
   id: "winnewtrans",
@@ -236,10 +233,11 @@ webix.ui({
 
 let winhide = function(){
      (function(w,k){
-      let tgl = "myProxy->" + urlhdata + "/" + formatdate(tglhariini);
+      let tgl = formatdate($$("tgltoday").getValue());      
+      let loadtgl = "myProxy->" + urlhdata + "/" + tgl;
       w.hide();
       k.clearAll();
-      k.load(tgl);
+      k.load(loadtgl);
      }
      )($$("win1"),$$("kanban1"));
 }

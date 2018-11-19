@@ -1,4 +1,4 @@
-<div id='grid-container'></div>
+<div id='grid-container' style="width:100%;height:450px;"></div>
 <script>
 function initial(str){
   const regex = /(\w)\w*/gm;
@@ -21,30 +21,60 @@ function initial(str){
  return hasil;
 }
 
-const textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
-<p>Contact WA: 0812 800 88681</p>
-<p>User : ${loginsession.name}</p>
-`
-
 const urldaysale = "/data/view/sales/";
 const urldaytrans = "/data/view/itemtrans/";
+const urlsumsales = "/data/view/sumsales/";
 
+let datajual = function(){
+  
+  webix.ajax().headers(logintoken).get(urlsumsales + tgliso , function(resp){
+     let dt=  JSON.parse(resp);
+     let hasil = webix.i18n.numberFormat(dt[0].sales || 0);
+     
+    return hasil;
+  });
+  
+           
+  
+}
+
+let textemplate = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
+<p>Contact WA: 0812 800 88681</p>
+<p>User : ${loginsession.name}</p>
+<Br>`
+
+const dtviewsalestemplate = (obj) => {
+  let hasil = `<div class="webix_strong">Miku Coffee </div>${tgli}<br>
+<p>Contact WA: 0812 800 88681</p>
+<p>User : ${loginsession.name}</p>
+<Br>`
+ hasil += "Total : " + webix.i18n.numberFormat(obj.sales || 0);
+ return hasil;     
+}
+
+const dtviewsales =
+ { view: "dataview", 
+   url: "myProxy->" + urlsumsales + tgliso , 
+   template: dtviewsalestemplate,
+   type: { width: 150, height: 250 } };
 
 const dvfunc = function(obj){
   let hasil = "";
   hasil = "ID : " + obj.id + "<div class=\"webix_strong\">" + obj.text + "</div>";
   hasil = hasil + "Status : " + obj.status + "<br>";
   hasil = hasil + "Jumlah : " + obj.jmlitems + "<br>";
-  hasil = hasil + "Total : " + webix.i18n.numberFormat(obj.total)  
+  hasil = hasil + "Total : " + webix.i18n.numberFormat(obj.total || 0)  
   return hasil;
 }
 
 const clmn =
       [ {id: "tgl", widht: 100, header : "Tanggal" },
-        {id: "itemdesc", width:200,header: "Nama Item", template: function(obj){return obj.itemdesc + " (" + initial(obj.itemdesc) + ")"}},
+        {id: "itemdesc", width:200,header: "Nama Item", 
+                     template: function(obj){return obj.itemdesc + " (" + initial(obj.itemdesc) + ")"}},
         {id: "qty",  css:{'text-align':'right'},  footer: { content: 'summColumn',css:{'text-align':'right'}},
                      header : { text: "Qty", css:{'text-align':'right'} } },
-        {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , numberFormat: "1,111.00",css:{'text-align':'right'}},
+        {id: "itemprices", header : { text: "Harga", css:{'text-align':'right'} } , 
+                     numberFormat: "1,111.00",css:{'text-align':'right'}},
         {id: "total" , header: { text: "Total", css:{'text-align':'right'} }, 
          footer: { content: 'summColumn',css:{'text-align':'right'}},
          numberFormat: "1,111.00", css:{'text-align':'right'}}
@@ -54,7 +84,7 @@ const barline =
       {
   view:"chart",
   id: "barchart",
-  width:300,
+  minWidth:300,
   height:220,
   type:"line",
   value:"#total#",
@@ -75,8 +105,8 @@ const barline =
   offset:0,
   yAxis:{
     start: 5000,
-    end: 105000,
-    step:10000,
+    end: 75000,
+    step: 10000,
     template:function(obj){
       return (obj%20?"":obj)
     }
@@ -108,13 +138,14 @@ let dashboard = {
   view: "dashboard",  
   gridColumns: 4,
   id : "dashboard1",
-  height: 560,
+  minWidth: 650,
+  minHeight: 560,
   cells: [{view: "panel", header: "Penjualan hari ini", 
            x:0 , y:0 , dx:1, dy:1, 
            body: dtshow},
           {view: "panel", header: "Graphic Penjualan", x:1 , y:0 , dx:3, dy:1, 
            body: barline },
-          {view: "panel", x:0 , y:1 , dx:1, dy:2, body: {template: textemplate}},
+          {view: "panel", x:0 , y:1 , dx:1, dy:2, body: dtviewsales} ,
           {view: "panel", x:1 , y:1 , dx:3, dy:1, body: viewall },
          ]
 }
@@ -134,7 +165,7 @@ let tb =
 webix.ui({
   view: "panel",
   container: "grid-container",
-  height: 600,
+  minHeight: 600,
   rows : [tb,dashboard]
 })
 

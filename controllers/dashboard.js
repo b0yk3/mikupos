@@ -41,9 +41,24 @@ let dailysale = function( req, res ){
 
 }
 
+let dailysumsales = function( req, res){
+  let tgl= req.params.tgl || "2018-11-10";
+  let sql = `select Date(a.date) tgl,sum(price*qty) sales from poshtrans a 
+             left join posdtrans b on a.id=b.poshtranid 
+             where status <> "cnl" and DATE(a.date)="${tgl}" 
+             group by (date(a.date));`;
+
+  db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT})
+  .then( xobj => {
+   res.json(xobj);
+})
+
+}
+
 module.exports = {
     daytrans,
     dailyitems,
-    dailysale
+    dailysale,
+    dailysumsales
 }
 

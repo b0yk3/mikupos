@@ -159,6 +159,7 @@ let dashboard = require("./controllers/dashboard");
 app.get('/data/view/trans/:tgl', dashboard.daytrans );
 app.get('/data/view/itemtrans/:tgl', dashboard.dailyitems );
 app.get('/data/view/sales/:tgl', dashboard.dailysale);
+app.get('/data/view/sumsales/:tgl' , dashboard.dailysumsales );
 
 
 console.log("app start on port : 9829 ");
