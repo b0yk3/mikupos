@@ -236,9 +236,10 @@ webix.ui({
 
 let winhide = function(){
      (function(w,k){
+      let tgl = "myProxy->" + urlhdata + "/" + formatdate(tglhariini);
       w.hide();
       k.clearAll();
-      k.load(urlhdata+"/"+ formatdate(tglhariini));
+      k.load(tgl);
      }
      )($$("win1"),$$("kanban1"));
 }
