@@ -48,17 +48,27 @@ let dailysumsales = function( req, res){
              where status <> "cnl" and DATE(a.date)="${tgl}" 
              group by (date(a.date));`;
 
+  
   db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT})
-  .then( xobj => {
-   res.json(xobj);
-})
+  .then( (sales) => {
+     res.json(sales); 
+  })
 
+}
+
+let uptoomzet = (req,res) => {
+  let sql = 'select itemdesc,sum(hrgjual) omzet,sum(qty) qty from _vtrans group by itemdesc order by omzet desc;'           
+  db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT})
+  .then( (omzet) => {
+     res.json(omzet); 
+  })
 }
 
 module.exports = {
     daytrans,
     dailyitems,
     dailysale,
-    dailysumsales
+    dailysumsales,
+    uptoomzet
 }
 

@@ -160,6 +160,7 @@ app.get('/data/view/trans/:tgl', dashboard.daytrans );
 app.get('/data/view/itemtrans/:tgl', dashboard.dailyitems );
 app.get('/data/view/sales/:tgl', dashboard.dailysale);
 app.get('/data/view/sumsales/:tgl' , dashboard.dailysumsales );
+app.get('/data/view/omzet' , dashboard.uptoomzet );
 
 
 console.log("app start on port : 9829 ");
