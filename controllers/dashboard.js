@@ -64,11 +64,26 @@ let uptoomzet = (req,res) => {
   })
 }
 
+let graphomzet30 = (req,res) =>
+{
+  let sql = `select date_format(gen_date,"%d") id,a.gen_date tgl,
+  ifnull((select sum(hrgjual) from _vtrans where Date(date) = tgl group by Date(date)),0) omzet,
+  ifnull((select sum(qty) from _vtrans where Date(date) = tgl group by Date(date)),0) qty
+  from _vgendate a where gen_date  between (current_date - interval 31 day) and current_date order by tgl`;
+
+  db.sequelize.query(sql, { type: db.sequelize.QueryTypes.SELECT})
+  .then( (graphomzet) => {
+     res.json(graphomzet); 
+  });
+
+}
+
 module.exports = {
     daytrans,
     dailyitems,
     dailysale,
     dailysumsales,
-    uptoomzet
+    uptoomzet,
+    graphomzet30
 }
 

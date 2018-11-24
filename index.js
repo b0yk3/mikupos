@@ -88,7 +88,6 @@ app.get('/logout', (req,res) =>{
 
     req.session = null;
     res.redirect('/');
-
 });
 
 let menu = require("./menu");
@@ -161,6 +160,7 @@ app.get('/data/view/itemtrans/:tgl', dashboard.dailyitems );
 app.get('/data/view/sales/:tgl', dashboard.dailysale);
 app.get('/data/view/sumsales/:tgl' , dashboard.dailysumsales );
 app.get('/data/view/omzet' , dashboard.uptoomzet );
+app.get('/data/view/graphomzet' , dashboard.graphomzet30 );
 
 
 console.log("app start on port : 9829 ");

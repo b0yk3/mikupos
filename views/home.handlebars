@@ -78,7 +78,7 @@ const barline =
   height:220,
   type:"line",
   value:"#omzet#",
-  tooltip: { template: "#itemdesc#" },
+  tooltip: { template: "#tgl#" },
   item:{
     borderColor: "#1293f8",
     color: "#ffffff"
@@ -89,7 +89,7 @@ const barline =
   },
   xAxis:{
     template: function(obj){
-      return initial(obj.itemdesc);
+      return obj.id; //initial(obj.itemdesc);
     }
   },
   offset:0,
@@ -101,7 +101,7 @@ const barline =
       return (obj%20?"":obj)
     }
   },
-  url: "myProxy->/data/view/omzet"
+  url: "myProxy->/data/view/graphomzet"
 }
 
 
