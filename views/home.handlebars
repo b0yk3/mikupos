@@ -74,11 +74,9 @@ const barline =
       {
   view:"chart",
   id: "barchart",
-  minWidth:300,
-  height:220,
   type:"line",
   value:"#omzet#",
-  tooltip: { template: "#tgl#" },
+  tooltip: { template: (obj)=>{return obj.tgl + "<br>Rp. " +  webix.i18n.numberFormat(obj.omzet || 0)} },
   item:{
     borderColor: "#1293f8",
     color: "#ffffff"
@@ -89,14 +87,14 @@ const barline =
   },
   xAxis:{
     template: function(obj){
-      return obj.id; //initial(obj.itemdesc);
+      return obj.ntgl; //initial(obj.itemdesc);
     }
   },
   offset:0,
   yAxis:{
     start: 0,
-    end: 500000,
-    step: 50000,
+    end: 600000,
+    step:100000,
     template:function(obj){
       return (obj%20?"":obj)
     }
@@ -141,7 +139,7 @@ let viewomzet =     { view: "datatable",
     
 
 let dashboard = {
-  view: "dashboard",  
+  view: "gridlayout",  
   gridColumns: 5,
   gridRows: 2,
   minHeight: 450,
@@ -150,11 +148,11 @@ let dashboard = {
   cells: [{view: "panel", header: "Penjualan hari ini", 
            x:0 , y:0 , dx:1, dy:1, 
            body: dtshow},
-          {view: "panel", header: "Graphic Penjualan", x:1 , y:0 , dx:2.5, dy:1, 
+          {view: "panel",type:"space", padding: 5, margin: 5, header: "Graphic Penjualan", x:1 , y:0 , dx:2.5, dy:1, 
            body: barline },
           {view: "panel", x:0 , y:1 , dx:1, dy:1, body: dtviewsales} ,
-          {view: "panel", x:1 , y:1 , dx:2.5, dy:1, body: viewall },
-          {view: "panel" , x:3.5 , y:0 , dx: 1.5, dy: 2 , body: viewomzet }
+          {view: "panel", x:1 , y:1 , dx:2.5, dy:1, body: viewall,padding: 5, margin: 5, type: "space" },
+          {view: "panel" , x:3.5 , y:0 , dx: 1.5, dy: 2 , body: viewomzet  ,type:"space",padding: 5, margin: 5, resize: true }
          ]
 }
 
@@ -178,11 +176,12 @@ webix.ui({
 })
 
 webix.ready(function(){
+
+
 $$("tglpilih").attachEvent("onChange", function(newv, oldv){
     let tgl = formatdate(newv);
    // $$("barchart").clearAll();
   //  $$("barchart").load("myProxy->"+urldaytrans+tgl)
-
     $$("dtshow").clearAll();
     $$("dtshow").load("myProxy->"+urldaysale+tgl);
 
